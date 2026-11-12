@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta name="robots" content="noindex">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Ultimate "Zero to Hero" AI Roadmap — Interactive Edition</title>
@@ -631,36 +632,6 @@
     </ol>
   </div>
 
-  <div class="propose" id="proposeSection">
-    <h2>Propose a Resource / Suggest Sequence Change</h2>
-    <p class="form-desc">Found a better resource or a smarter order? Share it below.</p>
-    <form id="proposeForm" novalidate>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="propName">Name</label>
-          <input type="text" id="propName" name="name" placeholder="Your name" autocomplete="name" required>
-        </div>
-        <div class="form-group">
-          <label for="propEmail">Email Address</label>
-          <input type="email" id="propEmail" name="email" placeholder="you@example.com" autocomplete="email" required>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="propDetails">Resource / Sequence Proposal Details</label>
-        <textarea id="propDetails" name="details" placeholder="Describe the resource, link, or sequence change..." required></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="submit" class="btn-submit" id="btnSubmit">Submit proposal</button>
-      </div>
-      <div class="form-success" id="formSuccess" role="status">
-        Thanks — your proposal was recorded. I’ll review it soon.
-      </div>
-      <div class="form-error" id="formError" role="alert">
-        Something went wrong. Please try again later.
-      </div>
-    </form>
-  </div>
-
   <footer>
     All primary resources listed are free. Progress is stored locally in your browser (localStorage).
   </footer>
@@ -734,66 +705,6 @@
     if (!confirm('Clear all progress? This cannot be undone.')) return;
     checkboxes.forEach(cb => { cb.checked = false; });
     updateProgress();
-  });
-
-  // ── Form → Google Sheet (or local fallback) ──
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBcr_awZVpiWxhOyKxF-3bHP8VSQaGFcshoW9wlpqaZKHRLHNXvYd_xo-o-2O4cCTL/exec';
-
-  const form = document.getElementById('proposeForm');
-  const successEl = document.getElementById('formSuccess');
-  const errorEl = document.getElementById('formError');
-  const btnSubmit = document.getElementById('btnSubmit');
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    successEl.classList.remove('visible');
-    errorEl.classList.remove('visible');
-
-    const name = document.getElementById('propName').value.trim();
-    const email = document.getElementById('propEmail').value.trim();
-    const details = document.getElementById('propDetails').value.trim();
-    if (!name || !email || !details) {
-      form.reportValidity();
-      return;
-    }
-
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Sending…';
-
-    const payload = { name, email, details };
-
-    try {
-      const prev = JSON.parse(localStorage.getItem('zeroToHeroAI_proposals') || '[]');
-      prev.push({ ...payload, at: new Date().toISOString() });
-      localStorage.setItem('zeroToHeroAI_proposals', JSON.stringify(prev.slice(-30)));
-    } catch (err) {}
-
-    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('PASTE_YOUR')) {
-      form.reset();
-      successEl.classList.add('visible');
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = 'Submit proposal';
-      setTimeout(() => successEl.classList.remove('visible'), 5000);
-      return;
-    }
-
-    try {
-      await fetch(GOOGLE_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(payload)
-      });
-      form.reset();
-      successEl.classList.add('visible');
-      setTimeout(() => successEl.classList.remove('visible'), 5000);
-    } catch (err) {
-      errorEl.classList.add('visible');
-      setTimeout(() => errorEl.classList.remove('visible'), 6000);
-    } finally {
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = 'Submit proposal';
-    }
   });
 })();
 </script>

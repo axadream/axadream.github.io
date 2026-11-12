@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alex Pintea — AI engineering, Blender and Three.js</title>
+<meta name="description" content="Alex Pintea: building toward remote AI engineering roles. AI projects, a daily practice log, Blender and Three.js.">
+<link rel="canonical" href="https://alepax.com/">
+<meta name="theme-color" content="#0F1115" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F5F7FA" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="dark light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Alex Pintea">
+<meta property="og:title" content="Alex Pintea — AI engineering, Blender and Three.js">
+<meta property="og:description" content="Building toward remote AI engineering roles. AI projects, a daily practice log, Blender and Three.js.">
+<meta property="og:url" content="https://alepax.com/">
+<meta property="og:image" content="https://alepax.com/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Alex Pintea — AI engineering, Blender and Three.js">
+<meta name="twitter:description" content="Building toward remote AI engineering roles. AI projects, a daily practice log, Blender and Three.js.">
+<meta name="twitter:image" content="https://alepax.com/assets/img/og.png">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/img/favicon.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Alex Pintea","url":"https://alepax.com/","sameAs":["https://github.com/axadream","https://www.linkedin.com/in/alex-pintea"],"jobTitle":"AI engineer (in training)"}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="wrap bar">
+    <a class="wordmark" href="/">Alex Pintea</a>
+    <nav aria-label="Primary">
+      <ul class="nav-list">
+        <li><a href="#projects">AI projects</a></li>
+        <li><a href="#log">Log</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <h1 id="hero-title">Alex Pintea</h1>
+      <p class="tagline">Building toward remote AI engineering roles</p>
+      <p class="sub">AI engineering, Blender and Three.js</p>
+      <p class="cta-row">
+        <a class="btn btn-primary" href="/OpenHorizon/">Open OpenHorizon</a>
+        <a class="btn btn-secondary" href="#log">Read the log</a>
+      </p>
+      <div class="card now-card">
+        <h2 class="now-title">Now</h2>
+        <ul class="now-list">
+          <li>Studying RAG and agents</li>
+          <li>Practicing Blender, Three.js</li>
+          <li>Building open-source AI projects</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="card hero-box" id="hero-box" role="img" aria-label="Low-poly icosphere with connected points, suggesting a neural network">
+        <svg class="hero-poster" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+          <g class="poster-edges" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity=".6">
+            <path d="M100 28 L150 56 L158 112 L100 172 L42 112 L50 56 Z"/>
+            <path d="M100 28 L100 172"/>
+            <path d="M50 56 L158 112"/>
+            <path d="M150 56 L42 112"/>
+            <path d="M100 28 L158 112 M100 28 L42 112 M100 172 L150 56 M100 172 L50 56"/>
+            <path d="M78 84 L124 84 L132 128 L68 128 Z" opacity=".7"/>
+            <path d="M78 84 L100 28 M124 84 L100 28 M132 128 L100 172 M68 128 L100 172 M78 84 L50 56 M124 84 L150 56 M132 128 L158 112 M68 128 L42 112"/>
+          </g>
+          <g class="poster-dots" fill="currentColor">
+            <circle cx="100" cy="28" r="3.2"/><circle cx="150" cy="56" r="3.2"/><circle cx="158" cy="112" r="3.2"/>
+            <circle cx="100" cy="172" r="3.2"/><circle cx="42" cy="112" r="3.2"/><circle cx="50" cy="56" r="3.2"/>
+            <circle cx="78" cy="84" r="2.6"/><circle cx="124" cy="84" r="2.6"/><circle cx="132" cy="128" r="2.6"/><circle cx="68" cy="128" r="2.6"/>
+            <circle cx="22" cy="40" r="1.8" opacity=".6"/><circle cx="182" cy="150" r="1.8" opacity=".6"/><circle cx="176" cy="30" r="1.8" opacity=".6"/><circle cx="24" cy="164" r="1.8" opacity=".6"/>
+          </g>
+        </svg>
+        <canvas id="hero-canvas" aria-hidden="true" data-scene="icosphere"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects" class="section wrap" aria-labelledby="projects-title">
+    <h2 id="projects-title" class="section-title reveal">AI projects</h2>
+    <div class="grid-2">
+      <article class="card project reveal" aria-labelledby="p1-title">
+        <picture>
+          <source media="(max-width: 600px)" srcset="assets/img/openhorizon-mobile.webp">
+          <img class="project-shot" src="assets/img/openhorizon.webp" width="1200" height="750" loading="lazy" decoding="async" alt="OpenHorizon reader showing a feed timeline and an open article">
+        </picture>
+        <div class="project-body">
+          <div class="project-head">
+            <h3 id="p1-title">OpenHorizon</h3>
+            <span class="badge badge-live">Live</span>
+          </div>
+          <p>Installable mobile-first RSS reader PWA. Runs in the browser with no account and no server storage; articles live in IndexedDB. OPML import/export, offline reading, full-article extraction and optional AI summaries (on-device, local server or cloud).</p>
+          <p class="tech">TypeScript · Vite · Workbox · GPL-3.0-or-later</p>
+          <p class="links">
+            <a class="btn btn-primary" href="/OpenHorizon/">Open app</a>
+            <a class="btn btn-secondary" href="https://github.com/axadream/OpenHorizon" rel="noopener">Source</a>
+          </p>
+        </div>
+      </article>
+      <article class="card project project-planned reveal" aria-labelledby="p2-title">
+        <div class="project-body">
+          <div class="project-head">
+            <h3 id="p2-title">Next AI project: RAG or agent, with evals</h3>
+            <span class="badge badge-planned">Planned</span>
+          </div>
+          <p>Scoped next; details will appear here when work starts.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- reserved: 3d-work -->
+  <!-- reserved: lab -->
+
+  <section id="log" class="section wrap" aria-labelledby="log-title">
+    <h2 id="log-title" class="section-title reveal">Log</h2>
+    <div class="card log-card reveal">
+      <p class="log-intro">Daily practice log. Times are shown as written.</p>
+      <p class="log-legend">✔️ = target met · floor = minimum day</p>
+      <ol class="log-list">
+<!-- log:start -->
+        <li class="log-row"><span class="log-ep">Ep 9</span><time datetime="2026-11-09">2026-11-09 Mon</time><span class="log-status status-met">✔️</span><span class="log-note">69 minutes on AI path</span></li>
+        <li class="log-row"><span class="log-ep">Ep 8</span><time datetime="2026-11-07">2026-11-07 Sat</time><span class="log-status status-met">✔️</span><span class="log-note">over 1 hour on AI path</span></li>
+        <li class="log-row"><span class="log-ep">Ep 7</span><time datetime="2026-11-06">2026-11-06 Fri</time><span class="log-status status-met">✔️</span><span class="log-note">over 50 minutes on AI path</span></li>
+<!-- log:end -->
+      </ol>
+      <p class="log-more">Full archive coming with the next phase.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap foot">
+    <ul class="foot-links">
+      <li><a href="https://github.com/axadream" rel="noopener">GitHub</a></li>
+      <li><a href="https://www.linkedin.com/in/alex-pintea" rel="noopener">LinkedIn</a></li>
+      <li><a id="email-link" href="#">Email</a></li>
+    </ul>
+    <p class="copy">© 2026 Alex Pintea</p>
+  </div>
+</footer>
+
+<script type="module" src="assets/js/site.js"></script>
+</body>
+</html>
