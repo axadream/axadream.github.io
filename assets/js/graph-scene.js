@@ -9,8 +9,10 @@ const K = {
 	EDGE_SPRING: 0.4, // neighbours follow this share
 	DRAG_THRESHOLD: 5,
 	HIT_RADIUS: 24,
-	AMBIENT_AMP: 4,
-	AMBIENT_PERIOD: 8,
+	AMBIENT_AMP: 8, // px
+	AMBIENT_PERIOD_MIN: 7, // s
+	AMBIENT_PERIOD_MAX: 12,
+	AMBIENT_Z: 0.08, // z wobble; ortho camera, so it drives scale/glow +-6%
 	PARALLAX_DEG: 3,
 	SCALE_MAX: 1.8,
 	IDLE_FPS: 30,
@@ -22,7 +24,7 @@ const cl = (v, a, b) => min(b, max(a, v));
 const sm = (a, b, x) => { x = cl((x - a) / (b - a), 0, 1); return x * x * (3 - 2 * x); };
 const F = (n) => new Float32Array(n);
 const mk = (t, c, x) => { const e = document.createElement(t); e.className = c; e.textContent = x; return e; };
-export async function startScene(canvas, { layout: L, box, list, reducedMotion: rm }) {
+export async function startScene(canvas, { layout: L, box, list, reducedMotion: rm, debug }) {
 	const pr = document.createElement('canvas');
 	if (!(pr.getContext('webgl2') || pr.getContext('webgl'))) return null;
 	const T = await import('../../vendor/three.module.min.js');
@@ -77,6 +79,8 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	const hx = F(N), hy = F(N), qx = F(N), qy = F(N), vx = F(N), vy = F(N), ax = F(N), ay = F(N);
 	const X = F(N), Y = F(N), Z = F(N), wp = F(N), pw = F(N), dm = F(N), hl = F(N), ss = F(N).fill(1);
 	const p1 = ns.map((n) => (fnv(n.id) % 628) / 100), p2 = ns.map((n) => ((fnv(n.id) >>> 9) % 628) / 100);
+	const om = ns.map((n) => 6.2832 / (K.AMBIENT_PERIOD_MIN + (((fnv(n.id) >>> 4) % 1000) / 1000) * (K.AMBIENT_PERIOD_MAX - K.AMBIENT_PERIOD_MIN)));
+	const zz = F(N);
 	const ed = F(E.length), eh = F(E.length), ne = F(E.length);
 	const m4 = new T.Matrix4(), tc = new T.Color();
 	let W = 1, Ht = 1, S = 1;
@@ -119,11 +123,12 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		}
 		links.forEach((a) => a.classList.toggle('is-active', act >= 0 && a.dataset.node === n.id));
 	};
+	const fps = () => (pin || drag || en > K.ENERGY_EPS ? K.ACTIVE_FPS : K.IDLE_FPS);
 	const frame = (now) => {
 		raf = 0;
 		if (dead) return;
 		const live = !rm;
-		if (live && lr && now - lr < 1000 / (pin || drag || en > K.ENERGY_EPS ? K.ACTIVE_FPS : K.IDLE_FPS) - 4) { sched(); return; }
+		if (live && lr && now - lr < 1000 / fps() - 4) { sched(); return; }
 		const dt = lr ? min((now - lr) / 1000, 0.033) : 0.016;
 		lr = now;
 		t += dt;
@@ -186,10 +191,12 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 				en += vx[i] ** 2 + vy[i] ** 2 + (ax[i] / hk) ** 2 + (ay[i] / hk) ** 2;
 			}
 		}
-		const am = live ? K.AMBIENT_AMP * min(1, t / 1.5) : 0, om = 6.2832 / K.AMBIENT_PERIOD;
+		const am = live ? min(1, t / 1.5) : 0;
 		for (let i = 0; i < N; i++) {
-			X[i] = qx[i] + am * sin(om * t + p1[i]);
-			Y[i] = qy[i] + am * sin(om * 1.31 * t + p2[i]);
+			X[i] = qx[i] + am * K.AMBIENT_AMP * sin(om[i] * t + p1[i]);
+			Y[i] = qy[i] + am * K.AMBIENT_AMP * sin(om[i] * 1.3 * t + p2[i] * 2);
+			zz[i] = am * sin(om[i] * 0.6 * t + p1[i] + p2[i]);
+			Z[i] += K.AMBIENT_Z * zz[i];
 		}
 		hov = pin && !drag ? near(K.HIT_RADIUS) : -1;
 		act = drag ? dn : hov >= 0 ? hov : sel >= 0 ? sel : foc;
@@ -209,11 +216,12 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 			hl[i] += (pw[i] - hl[i]) * k;
 			tc.copy(cols[i]).lerp(bg, 0.78 * dm[i]).lerp(white, 0.45 * hl[i] * (1 - dm[i]));
 			nodes.setColorAt(i, tc);
-			const s = pln[i] ? 1e-4 : sz[i] * ss[i];
+			const zs = 1 + 0.75 * K.AMBIENT_Z * zz[i];
+			const s = pln[i] ? 1e-4 : sz[i] * ss[i] * zs;
 			nodes.setMatrixAt(i, m4.makeScale(s, s, s).setPosition(wx(i), wy(i), Z[i]));
-			const g = pln[i] ? 1e-4 : sz[i] * ss[i] * GR;
+			const g = pln[i] ? 1e-4 : sz[i] * ss[i] * GR * zs;
 			glow.setMatrixAt(i, m4.makeScale(g, g, 1).setPosition(wx(i), wy(i), Z[i] - 0.03));
-			glow.setColorAt(i, tc.copy(cols[i]).multiplyScalar((0.7 + 0.8 * hl[i]) * (1 - dm[i])));
+			glow.setColorAt(i, tc.copy(cols[i]).multiplyScalar((0.7 + 0.8 * hl[i] + 0.2 * zz[i]) * (1 - dm[i])));
 		}
 		const pl = live ? sin(t * 2) : 0;
 		rings.forEach((i, j) => {
@@ -327,6 +335,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	});
 	io.observe(box);
 	resize();
+	if (debug) window.__graph = { positions: () => ns.map((n, i) => [n.id, W / 2 + X[i], Ht / 2 + Y[i]]), energy: () => en, fps };
 	const api = {
 		highlight(id) {
 			foc = id == null ? -1 : ns.findIndex((n) => n.id === id);
@@ -336,6 +345,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		dispose() {
 			if (dead) return;
 			dead = true;
+			if (debug) delete window.__graph;
 			stop();
 			io.disconnect();
 			ro.disconnect();

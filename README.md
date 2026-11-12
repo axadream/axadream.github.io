@@ -10,6 +10,15 @@ python -m http.server 8080
 
 Then open http://localhost:8080/
 
+## Debugging motion
+
+- Add `?motion=force` on localhost or 127.0.0.1 to run the hero graph even when
+  prefers-reduced-motion is set. Ignored on any other host.
+- The same override exposes `window.__graph` with `positions()`, `energy()` and `fps()`.
+  It is removed when the scene is disposed.
+- Ambient float amplitude, period range and depth wobble are the `AMBIENT_*` constants
+  in the `K` block of `graph-scene.js`.
+
 ## Structure
 
 - `index.html` - the landing page

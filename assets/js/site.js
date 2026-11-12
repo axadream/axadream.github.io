@@ -1,6 +1,7 @@
 import { layout, days, project, when, stars, R, H, GR, GA, SC } from './graph-layout.js';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const force = /[?&]motion=force\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 document.documentElement.classList.add('js');
 
 (function () {
@@ -105,7 +106,7 @@ if (!reduced) {
 	const start = async () => {
 		try {
 			const mod = await import('./graph-scene.js');
-			scene = await mod.startScene(canvas, { layout: L, box, list, reducedMotion: reduced });
+			scene = await mod.startScene(canvas, { layout: L, box, list, reducedMotion: reduced && !force, debug: force });
 		} catch (e) { /* poster stays */ }
 	};
 
