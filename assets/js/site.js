@@ -32,6 +32,33 @@ document.documentElement.classList.add('js');
 	a.setAttribute('aria-label', 'Email ' + addr);
 })();
 
+(function () {
+	const r = document.documentElement, b = document.getElementById('theme-toggle'), h = document.querySelector('.site-header');
+	const set = (t) => {
+		const l = t === 'light';
+		r.dataset.theme = t;
+		b.setAttribute('aria-pressed', l);
+		b.setAttribute('aria-label', 'Switch to ' + (l ? 'dark' : 'light') + ' theme');
+		document.getElementById('tc').content = l ? '#F5F7FA' : '#0F1115';
+	};
+	set(r.dataset.theme || 'dark');
+	b.onclick = () => {
+		const t = r.dataset.theme === 'light' ? 'dark' : 'light';
+		set(t);
+		try { localStorage.setItem('theme', t); } catch (e) { }
+	};
+	const sc = () => h.classList.toggle('is-scrolled', scrollY > 8);
+	sc();
+	addEventListener('scroll', sc, { passive: true });
+	if (!('IntersectionObserver' in window)) return;
+	const o = new IntersectionObserver((es) => es.forEach((e) => {
+		if (!e.isIntersecting) return;
+		document.querySelectorAll('.nav-list a').forEach((a) =>
+			a.toggleAttribute('aria-current', a.hash === '#' + e.target.id) && a.setAttribute('aria-current', 'true'));
+	}), { rootMargin: '-40% 0px -55% 0px' });
+	document.querySelectorAll('#projects,#log').forEach((s) => o.observe(s));
+})();
+
 if (!reduced) {
 	document.querySelectorAll('a[href^="#"]').forEach((a) => {
 		a.addEventListener('click', (ev) => {
@@ -46,7 +73,6 @@ if (!reduced) {
 	});
 }
 
-// SVG poster now, Three.js scene lazily
 (async function () {
 	const box = document.getElementById('hero-box');
 	const canvas = document.getElementById('hero-canvas');
@@ -97,7 +123,7 @@ if (!reduced) {
 		const d = Math.max(0, days(newest, now));
 		const up = document.getElementById('graph-updated');
 		if (up) up.textContent = 'Last update: ' + (d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago');
-	} catch (e) { return; /* static fallback stays */ }
+	} catch (e) { return; }
 	if (navigator.connection?.saveData) return;
 	const list = document.querySelector('nav[aria-label="Site map"]');
 	let scene = null;
@@ -107,11 +133,11 @@ if (!reduced) {
 		try {
 			const mod = await import('./graph-scene.js');
 			scene = await mod.startScene(canvas, { layout: L, box, list, reducedMotion: reduced && !force, debug: force });
-		} catch (e) { /* poster stays */ }
+		} catch (e) { }
 	};
 
 	window.addEventListener('pagehide', () => {
-		try { scene && scene.dispose(); } catch (e) { /* ignore */ }
+		try { scene && scene.dispose(); } catch (e) { }
 		scene = null;
 	});
 
