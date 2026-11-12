@@ -4,6 +4,23 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-12
+
+### Added
+
+- Practice log entries as Markdown files in `content/log/`, with a JSON schema in `schema/`.
+- `scripts/build-log.mjs` generates the home page's 12 newest entries, the `/log/` archive, `data/nodes.json`, and the generated site map. `--check` fails if outputs are stale.
+- GitHub Actions Pages workflow with pinned action SHAs and least-privilege permissions.
+- Self-hosted Sveltia CMS 0.265.0 at `/admin/`, with a Content Security Policy.
+- Guard checks 6-8: log entry validation, build freshness, and the admin host allowlist.
+- `node:test` suite under `tests/`.
+
+### Changed
+
+- Log rows drop the status column. Entries Ep 1-9 are migrated as "Manual Code".
+- Graph `maxNodes` is 14.
+- The sitemap includes `/log/`.
+
 ## [1.0.1] - 2026-11-12
 
 ### Fixed

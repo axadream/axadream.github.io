@@ -270,7 +270,6 @@ h1 {
 
 /* log */
 .log-card { padding: clamp(18px, 3vw, 28px); }
-.log-legend { color: var(--muted); font-size: .9rem; margin-top: 4px; }
 .log-list { margin-top: 18px; border-top: 1px solid var(--card-border); }
 .log-row {
   display: grid; grid-template-columns: 3.5rem 1fr; gap: 2px 14px;
@@ -278,13 +277,12 @@ h1 {
 }
 .log-ep { font-weight: 700; color: var(--accent); font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .log-row time { color: var(--muted); font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: .92em; }
-.log-status { grid-column: 1; }
 .log-note { grid-column: 2; }
-.status-met { color: var(--accent); }
-.status-floor { color: var(--muted); font-style: italic; }
+.log-min { color: var(--muted); }
+.log-src { margin-left: .5em; }
 @media (min-width: 700px) {
-  .log-row { grid-template-columns: 4rem 11rem 3rem 1fr; }
-  .log-status, .log-note { grid-column: auto; }
+  .log-row { grid-template-columns: 4rem 11rem 1fr; }
+  .log-note { grid-column: auto; }
 }
 .log-more { margin-top: var(--s2); color: var(--muted); font-size: .9rem; }
 
