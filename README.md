@@ -76,6 +76,12 @@ segment in any shipped path.
   Nothing with that name may be added to this repository.
 - To publish, merge `v1-site` into `main`.
 
+## Versioning
+
+- The version lives in `site.config.json` (`version`), mirrored in the footer `.foot-ver` line of `index.html` and in `CHANGELOG.md`.
+- `scripts/check-no-business.mjs` fails if the three disagree, or if `threeDWork` or `lab` is not `false`.
+- Release: bump all three, run the guard, commit, then tag `v<version>`.
+
 ## Licence
 
 Not yet decided. There is no LICENSE file.

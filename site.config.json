@@ -1,1 +1,8 @@
-{"graph":{"maxNodes":24}}
+{
+  "version": "1.0.0",
+  "graph": {
+    "maxNodes": 24
+  },
+  "threeDWork": false,
+  "lab": false
+}
