@@ -84,8 +84,8 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	const ed = F(E.length), eh = F(E.length), ne = F(E.length);
 	const m4 = new T.Matrix4(), tc = new T.Color();
 	let W = 1, Ht = 1, S = 1;
-	let px = 0, py = 0, pin = false, pt = '', dn = -1, sx0 = 0, sy0 = 0, drag = false, sup = false;
-	let hov = -1, sel = -1, foc = -1, act = -1, ak = -1, en = 1;
+	let px = 0, py = 0, pin = false, pt = '', dn = -1, sx0 = 0, sy0 = 0, drag = false, sup = false, cp = -1, pz = false;
+	let hov = -1, sel = -1, foc = -1, act = -1, ak = -1, en = rm ? 0 : 1;
 	let lw = 0, lh = 0, t = 0, rx = 0, ry = 0, lr = 0, lastMove = -1e9;
 	let raf = 0, inView = true, dead = false, init = true;
 	const go = (i) => {
@@ -266,7 +266,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		}
 		if (live) sched();
 	};
-	const sched = () => { if (!raf && !dead && inView && !document.hidden) raf = requestAnimationFrame(frame); };
+	const sched = () => { if (!raf && !dead && !pz && inView && !document.hidden) raf = requestAnimationFrame(frame); };
 	const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0; lr = 0; };
 	const resize = () => {
 		W = box.clientWidth || 1;
@@ -297,7 +297,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		lastMove = performance.now();
 		if (dn >= 0 && !drag && hypot(px - sx0, py - sy0) > K.DRAG_THRESHOLD) {
 			drag = true;
-			try { box.setPointerCapture(e.pointerId); } catch (x) { /* ignore */ }
+			try { box.setPointerCapture(cp = e.pointerId); } catch (x) { /* ignore */ }
 		}
 		sched();
 	});
@@ -311,9 +311,16 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		sy0 = py;
 		dn = near(K.HIT_RADIUS);
 	});
-	const up = () => { sup = drag; drag = false; dn = -1; sched(); };
+	const up = () => { sup = drag; drag = false; dn = cp = -1; sched(); };
+	const rs = () => {
+		try { if (cp >= 0) box.releasePointerCapture(cp); } catch (x) { /* ignore */ }
+		cp = dn = -1;
+		drag = sup = pin = false;
+		box.classList.remove('is-over-node', 'is-dragging');
+	};
 	on(box, 'pointerup', up);
-	on(box, 'pointercancel', up);
+	on(box, 'pointercancel', () => { rs(); sched(); });
+	on(window, 'blur', rs);
 	on(box, 'click', (e) => {
 		if (sup) { sup = false; return; }
 		rel(e);
@@ -322,7 +329,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		const i = near(K.HIT_RADIUS);
 		if (i >= 0) go(i);
 	});
-	on(document, 'visibilitychange', () => (document.hidden ? stop() : sched()));
+	on(document, 'visibilitychange', () => { if (document.hidden) { rs(); stop(); } else sched(); });
 	if (list) {
 		on(list, 'focusin', (e) => { const a = e.target.closest('a[data-node]'); if (a) api.highlight(a.dataset.node); });
 		on(list, 'focusout', () => api.highlight(null));
@@ -342,6 +349,8 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 			lastMove = performance.now();
 			sched();
 		},
+		pause() { pz = true; rs(); stop(); },
+		resume() { pz = false; rs(); sched(); },
 		dispose() {
 			if (dead) return;
 			dead = true;

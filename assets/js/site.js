@@ -1,7 +1,8 @@
 import { layout, days, project, when, stars, R, H, GR, GA, SC } from './graph-layout.js';
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const force = /[?&]motion=force\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const dbg = /[?&]motion=(force|reduce)\b/.test(location.search) && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const force = dbg && /motion=force/.test(location.search);
 document.documentElement.classList.add('js');
 
 (function () {
@@ -128,17 +129,37 @@ if (!reduced) {
 	const list = document.querySelector('nav[aria-label="Site map"]');
 	let scene = null;
 	let started = false;
+	let cv = canvas;
 
 	const start = async () => {
 		try {
 			const mod = await import('./graph-scene.js');
-			scene = await mod.startScene(canvas, { layout: L, box, list, reducedMotion: reduced && !force, debug: force });
+			cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); scene && scene.pause(); });
+			cv.addEventListener('webglcontextrestored', rebuild);
+			scene = await mod.startScene(cv, { layout: L, box, list, reducedMotion: reduced && !force, debug: dbg });
 		} catch (e) { }
 	};
-
-	window.addEventListener('pagehide', () => {
+	// A canvas whose context was force-lost cannot get a new one, so rebuild on a fresh canvas.
+	const rebuild = () => {
 		try { scene && scene.dispose(); } catch (e) { }
 		scene = null;
+		const n = cv.cloneNode(false);
+		n.classList.remove('is-ready');
+		cv.replaceWith(n);
+		cv = n;
+		box.classList.remove('scene-on');
+		start();
+	};
+
+	window.addEventListener('pagehide', (e) => {
+		if (e.persisted) { scene && scene.pause(); return; }
+		try { scene && scene.dispose(); } catch (x) { }
+		scene = null;
+	});
+	window.addEventListener('pageshow', (e) => {
+		if (!e.persisted || !scene) return;
+		const g = cv.getContext('webgl2') || cv.getContext('webgl');
+		if (!g || g.isContextLost()) rebuild(); else scene.resume();
 	});
 
 	const arm = () => {

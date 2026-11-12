@@ -8,6 +8,7 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative, sep, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const root = resolve(scriptDir, '..');
@@ -135,6 +136,36 @@ try {
   }
 } catch (e) {
   failures.push(`index.html: cannot read (${e.message})`);
+}
+
+// JS budget (5): gzipped first-party JS plus the classic inline <script> in <head>.
+const JS_GZIP_BUDGET = 12288;
+const JS_RAW_WARN = 24000;
+try {
+  const parts = [];
+  for (const f of ['assets/js/site.js', 'assets/js/graph-layout.js', 'assets/js/graph-scene.js']) {
+    parts.push(await readFile(join(root, f), 'utf8'));
+  }
+  const html = await readFile(join(root, 'index.html'), 'utf8');
+  const head = html.slice(0, html.indexOf('</head>'));
+  for (const m of head.matchAll(/<script(\s[^>]*)?>([\s\S]*?)<\/script>/gi)) {
+    const attrs = m[1] || '';
+    if (/\ssrc=/i.test(attrs)) continue;
+    const type = (attrs.match(/\stype=["']?([^"'\s>]+)/i) || [])[1];
+    if (type && !/^(text|application)\/javascript$/i.test(type)) continue;
+    parts.push(m[2]);
+  }
+  const gz = parts.reduce((n, s) => n + gzipSync(Buffer.from(s, 'utf8'), { level: 9 }).length, 0);
+  const raw = parts.reduce((n, s) => n + Buffer.byteLength(s, 'utf8'), 0);
+  console.log(`guard: js gzipped ${gz} B of ${JS_GZIP_BUDGET} B (raw ${raw} B)`);
+  if (gz > JS_GZIP_BUDGET) {
+    failures.push(`js budget: gzipped ${gz} B exceeds ${JS_GZIP_BUDGET} B`);
+  }
+  if (raw > JS_RAW_WARN) {
+    console.log(`WARNING: js raw ${raw} B exceeds ${JS_RAW_WARN} B (warning only)`);
+  }
+} catch (e) {
+  failures.push(`js budget: cannot read sources (${e.message})`);
 }
 
 if (failures.length > 0) {
