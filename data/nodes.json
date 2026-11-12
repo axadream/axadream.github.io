@@ -1,6 +1,6 @@
 [
-  {"id":"openhorizon","type":"project","label":"OpenHorizon","date":"2026-11-12","url":"/OpenHorizon/"},
-  {"id":"next-ai-project","type":"project","label":"Next AI project: RAG or agent, with evals","date":"2026-11-12","url":"#projects"},
+  {"id":"openhorizon","type":"project","status":"released","label":"OpenHorizon","updated":"2026-11-11","url":"/OpenHorizon/"},
+  {"id":"next-ai-project","type":"project","status":"planned","label":"Next AI project: RAG or agent, with evals","title":"Next AI project","url":"#projects"},
   {"id":"log-ep9","type":"log","label":"Ep 9 · 2026-11-09 · 69 minutes on AI path","date":"2026-11-09","url":"#log"},
   {"id":"log-ep8","type":"log","label":"Ep 8 · 2026-11-07 · over 1 hour on AI path","date":"2026-11-07","url":"#log"},
   {"id":"log-ep7","type":"log","label":"Ep 7 · 2026-11-06 · over 50 minutes on AI path","date":"2026-11-06","url":"#log"}

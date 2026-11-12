@@ -15,13 +15,22 @@ Then open http://localhost:8080/
 - `index.html` - the landing page
 - `assets/css/site.css` - styles
 - `assets/js/site.js` - main script
-- `assets/js/hero-scene.js` - lazy-loaded Three.js chunk for the hero
+- `assets/js/graph-scene.js` - lazy-loaded Three.js chunk for the hero graph
 - `assets/js/graph-layout.js` - pure layout functions shared by the SVG poster and the scene
-- `data/nodes.json` - nodes of the hero site graph (project and log entries); `site.config.json` sets `graph.maxNodes`
+- `data/nodes.json` - nodes of the hero site graph, see below; `site.config.json` sets `graph.maxNodes`
 - `vendor/three.module.min.js` - Three.js, pinned to 0.170.0
 - `assets/img/` - images and icons
 - `archive/` - legacy pages, marked noindex and disallowed in `robots.txt`
 - `scripts/check-no-business.mjs` - repository guard (see below)
+
+## nodes.json
+
+One object per node: `id`, `type` (`project` or `log`), `label`, `url`.
+
+- Project: `status` is `released` or `planned`. A released project has `updated` (ISO date, replaces `date`); a planned project has no date and renders as a dim hollow ring labelled `(planned)`. Optional `title` is the short name shown in the graph label.
+- Log: `date` (ISO). The label's text before ` · ` is the short name.
+- `Last update` counts log dates and released projects' `updated` only; node colour tiers (new <= 7 days, recent <= 30, older) follow the same dates.
+- Motion constants live in the `K` block at the top of `graph-scene.js`. Node positions are never stored.
 
 ## How to add a log entry
 
