@@ -64,7 +64,8 @@
       </div>
     </div>
     <div class="hero-visual">
-      <div class="card hero-box" id="hero-box" role="img" aria-label="Low-poly icosphere with connected points, suggesting a neural network">
+      <div class="graph-wrap">
+      <div class="card hero-box" id="hero-box" role="group" aria-label="Site graph: projects and log entries">
         <svg class="hero-poster" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
           <g class="poster-edges" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity=".6">
             <path d="M100 28 L150 56 L158 112 L100 172 L42 112 L50 56 Z"/>
@@ -82,7 +83,24 @@
             <circle cx="22" cy="40" r="1.8" opacity=".6"/><circle cx="182" cy="150" r="1.8" opacity=".6"/><circle cx="176" cy="30" r="1.8" opacity=".6"/><circle cx="24" cy="164" r="1.8" opacity=".6"/>
           </g>
         </svg>
-        <canvas id="hero-canvas" aria-hidden="true" data-scene="icosphere"></canvas>
+        <canvas id="hero-canvas" aria-hidden="true" data-scene="graph"></canvas>
+        <div id="graph-label" class="graph-label" aria-live="polite"></div>
+      </div>
+      <div class="legend">
+        <span class="lg"><i class="dot t-new"></i>New</span>
+        <span class="lg"><i class="dot t-recent"></i>Recent</span>
+        <span class="lg"><i class="dot t-older"></i>Older</span>
+        <span class="lg-upd" id="graph-updated">Last update: see the log</span>
+      </div>
+      <nav class="sitemap" aria-label="Site map">
+        <ul>
+          <li><a href="/OpenHorizon/" data-node="openhorizon">OpenHorizon</a></li>
+          <li><a href="#projects" data-node="next-ai-project">Next AI project: RAG or agent, with evals</a></li>
+          <li><a href="#log" data-node="log-ep9">Ep 9 · 2026-11-09 · 69 minutes on AI path</a></li>
+          <li><a href="#log" data-node="log-ep8">Ep 8 · 2026-11-07 · over 1 hour on AI path</a></li>
+          <li><a href="#log" data-node="log-ep7">Ep 7 · 2026-11-06 · over 50 minutes on AI path</a></li>
+        </ul>
+      </nav>
       </div>
     </div>
   </section>
@@ -147,7 +165,7 @@
       <li><a href="https://www.linkedin.com/in/alex-pintea" rel="noopener">LinkedIn</a></li>
       <li><a id="email-link" href="#">Email</a></li>
     </ul>
-    <p class="copy">© 2026 Alex Pintea</p>
+    <p class="copy">© Alex Pintea, all rights reserved</p>
   </div>
 </footer>
 

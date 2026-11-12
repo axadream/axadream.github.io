@@ -25,6 +25,7 @@ const terms = [
 
 const reservedSegment = ['Open', 'Horizon'].join('').toLowerCase();
 
+// Everything outside skipDirs is scanned, including data/ and all .json files.
 const skipDirs = new Set(['.git', 'node_modules', '.claude', '_incoming', 'vendor']);
 const binaryExt = new Set(['.png', '.webp', '.jpg', '.ico', '.woff2']);
 

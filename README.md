@@ -16,6 +16,8 @@ Then open http://localhost:8080/
 - `assets/css/site.css` - styles
 - `assets/js/site.js` - main script
 - `assets/js/hero-scene.js` - lazy-loaded Three.js chunk for the hero
+- `assets/js/graph-layout.js` - pure layout functions shared by the SVG poster and the scene
+- `data/nodes.json` - nodes of the hero site graph (project and log entries); `site.config.json` sets `graph.maxNodes`
 - `vendor/three.module.min.js` - Three.js, pinned to 0.170.0
 - `assets/img/` - images and icons
 - `archive/` - legacy pages, marked noindex and disallowed in `robots.txt`
@@ -59,3 +61,5 @@ segment in any shipped path.
 ## Licence
 
 Not yet decided. There is no LICENSE file.
+
+© Alex Pintea, all rights reserved. Third-party notices live in `/vendor/`.
