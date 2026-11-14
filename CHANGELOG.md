@@ -4,6 +4,12 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2] - 2026-11-14
+
+### Changed
+
+- Guard: stale generated outputs after markdown-only post commits are a WARN by default; `--strict` fails them (CI still rebuilds and checks). Regenerated log build outputs.
+
 ## [1.1.1] - 2026-11-12
 
 ### Added

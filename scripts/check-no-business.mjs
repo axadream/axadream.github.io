@@ -15,6 +15,7 @@ import { parseEntryFile, validateEntry } from './build-log.mjs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const root = resolve(scriptDir, '..');
+const strict = process.argv.includes('--strict');
 
 const terms = [
   ['al', 'mixt'],
@@ -219,8 +220,22 @@ try {
     encoding: 'utf8',
   });
   if (check.status !== 0) {
-    const out = `${check.stdout || ''}${check.stderr || ''}`.trim().replace(/\s*\r?\n\s*/g, ' | ');
-    failures.push(`build up to date: node scripts/build-log.mjs --check exited ${check.status}: ${out}`);
+    const stdout = check.stdout || '';
+    const staleOnly = check.status === 1 && /build-log: out of date/.test(stdout);
+    if (staleOnly && !strict) {
+      const stale = stdout
+        .split(/\r?\n/)
+        .filter((l) => /^ {2}\S/.test(l))
+        .map((l) => l.trim())
+        .join(', ');
+      console.log(
+        'guard: WARN build outputs stale (index.html, log/index.html, data/nodes.json may be out of date; run node scripts/build-log.mjs). CI regenerates them.' +
+          (stale ? ` Stale: ${stale}.` : '')
+      );
+    } else {
+      const out = `${stdout}${check.stderr || ''}`.trim().replace(/\s*\r?\n\s*/g, ' | ');
+      failures.push(`build up to date: node scripts/build-log.mjs --check exited ${check.status}: ${out}`);
+    }
   }
 }
 
