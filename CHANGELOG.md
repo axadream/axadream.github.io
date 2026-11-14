@@ -4,6 +4,14 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-11-12
+
+### Added
+
+- Claude Code skill `log-post` in `tools/log-post/`: `post.mjs` (preview, explicit yes, idempotent Contents API PUT to `content/log/` on `main`, pending queue with `--flush`, `--dry` mode), `SKILL.md`, and an installer `install.ps1` that copies the skill to `~/.claude/skills/log-post` and creates `~/.alepax-log/` outside any repository.
+- Tests for the skill, including a check that its schema copy equals `schema/`.
+- README section "Logging from Claude Code (skill `log-post`)".
+
 ## [1.1.0] - 2026-11-12
 
 ### Added

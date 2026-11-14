@@ -38,7 +38,7 @@ Then open http://localhost:8080/
 One object per node: `id`, `type` (`project` or `log`), `label`, `url`.
 
 - Project: `status` is `released` or `planned`. A released project has `updated` (ISO date, replaces `date`); a planned project has no date and renders as a dim hollow ring labelled `(planned)`. Optional `title` is the short name shown in the graph label.
-- Log: `date` (ISO). The label's text before ` · ` is the short name.
+- Log: `date` (ISO). The label's text before ` - ` is the short name.
 - `Last update` counts log dates and released projects' `updated` only; node colour tiers (new <= 7 days, recent <= 30, older) follow the same dates.
 - Motion constants live in the `K` block at the top of `graph-scene.js`. Node positions are never stored.
 
@@ -73,13 +73,41 @@ Then run `node scripts/build-log.mjs`, review the diff, and commit.
 
 ## Access token
 
-1. GitHub → Settings → Developer settings → Fine-grained tokens → Generate new token.
-2. Resource owner: `axadream`. Repository access: **Only select repositories** → `axadream.github.io`.
-3. Permissions: **Contents** → Read and write. Metadata read is added automatically.
+1. GitHub -> Settings -> Developer settings -> Fine-grained tokens -> Generate new token.
+2. Resource owner: `axadream`. Repository access: **Only select repositories** -> `axadream.github.io`.
+3. Permissions: **Contents** -> Read and write. Metadata read is added automatically.
 4. Expiration: 90 days.
 5. Store the token in a password manager. Never commit it or paste it into a log or screenshot.
-6. To revoke: the same token page → the token → Delete. If a token ever appears in a
+6. To revoke: the same token page -> the token -> Delete. If a token ever appears in a
    log, a screenshot or a commit, revoke it at once.
+
+## Logging from Claude Code (skill `log-post`)
+
+The skill `log-post` (in `tools/log-post/`) writes a practice log entry from a Claude Code
+session. It shows a preview, waits for an explicit yes, then creates the entry under
+`content/log/` on `main` through the GitHub Contents API. Posting the same entry twice does
+nothing. If the network is unavailable, the entry is kept in a pending queue; run `--flush`
+to send it later.
+
+Install (from the repository root):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools/log-post/install.ps1
+```
+
+The installer copies the skill to `~/.claude/skills/log-post` and creates the config folder
+`~/.alepax-log/` outside any repository, with two files:
+
+- `allowed-projects.txt`: absolute project paths, one per line. The script refuses to run from anywhere else.
+- `deny-terms.txt`: one term per line, case-insensitive. Entries whose text or link contain a term are refused.
+
+Token: set the environment variable `ALEPAX_LOG_TOKEN` to the same fine-grained token as in
+the [Access token](#access-token) section. Never write it into a file.
+
+Use `--dry` for a preview without any network call.
+
+The skill keeps its own copy of the schema (`tools/log-post/log-entry.schema.json`). It must
+stay equal to `schema/`; a test enforces this.
 
 ## Reserved sections
 
@@ -120,11 +148,11 @@ segment in any shipped path. It also reports gzipped first-party JS against a 12
 ### Deploy: switching Pages to GitHub Actions
 
 1. Merge to `main`.
-2. Repo Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-3. Actions tab → **pages** workflow → **Run workflow** (branch `main`).
+2. Repo Settings -> Pages -> Build and deployment -> Source: **GitHub Actions**.
+3. Actions tab -> **pages** workflow -> **Run workflow** (branch `main`).
 4. Verify https://alepax.com, https://alepax.com/log/ and https://alepax.com/admin/.
 
-Rollback: Settings → Pages → Source: **Deploy from a branch** → `main` / `(root)`.
+Rollback: Settings -> Pages -> Source: **Deploy from a branch** -> `main` / `(root)`.
 This redeploys the committed files within minutes. The workflow can stay enabled.
 
 The CMS Content Security Policy is the `<meta http-equiv="Content-Security-Policy">`
