@@ -40,6 +40,26 @@ test('compact ts and weekday in own offset', () => {
   assert.deepEqual(localParts('2026-11-10T22:30:00-05:00'), { date: '2026-11-10', dow: 'Tue' });
 });
 
+test('empty CMS optional fields are treated as absent', () => {
+  const text = [
+    '---',
+    'ts: 2026-11-14T15:53:00+02:00',
+    'tag: AI Prompt Skill',
+    'minutes: 65',
+    "link: ''",
+    "project: ''",
+    'draft: false',
+    '---',
+    'hello',
+  ].join('\n');
+  const o = parseEntryFile(text);
+  assert.deepEqual(validateEntry(o), []);
+  assert.equal('link' in o, false);
+  assert.equal('project' in o, false);
+  const bad = parseEntryFile(text.replace("link: ''", 'link: http://x'));
+  assert.match(validateEntry(bad).join(), /"link"/);
+});
+
 function tempRoot() {
   const root = mkdtempSync(join(tmpdir(), 'build-log-'));
   for (const f of ['index.html', 'schema/log-entry.schema.json', 'data/projects.json']) {

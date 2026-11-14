@@ -38,6 +38,7 @@ export function parseEntryFile(text) {
     let val = line.slice(i + 1).trim();
     const q = /^(["'])([\s\S]*)\1$/.exec(val);
     if (q) val = q[2];
+    if (val === '') continue; // CMS writes empty optionals as '' -> treat as absent
     const type = props[key] && props[key].type;
     if (type === 'integer' && /^-?\d+$/.test(val)) obj[key] = Number(val);
     else if (type === 'boolean' && (val === 'true' || val === 'false')) obj[key] = val === 'true';

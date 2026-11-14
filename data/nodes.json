@@ -1,6 +1,7 @@
 [
   {"id":"openhorizon","type":"project","status":"released","label":"OpenHorizon","updated":"2026-11-11","url":"/OpenHorizon/"},
   {"id":"next-ai-project","type":"project","status":"planned","label":"Next AI project: RAG or agent, with evals","title":"Next AI project","url":"#projects"},
+  {"id":"log-20261114T135300Z","type":"log","label":"Ep 11 · 2026-11-14 · working on alepax.com","date":"2026-11-14","url":"/#e-20261114T135300Z"},
   {"id":"log-20261114T134028Z","type":"log","label":"Ep 10 · 2026-11-14 · Log pipeline is live. Three gated branches merged through p…","date":"2026-11-14","url":"/#e-20261114T134028Z"},
   {"id":"log-20261109T190000Z","type":"log","label":"Ep 9 · 2026-11-09 · 69 minutes on the AI path.","date":"2026-11-09","url":"/#e-20261109T190000Z"},
   {"id":"log-20261107T190000Z","type":"log","label":"Ep 8 · 2026-11-07 · Over 1 hour on the AI path.","date":"2026-11-07","url":"/#e-20261107T190000Z"},
