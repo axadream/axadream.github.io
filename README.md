@@ -13,7 +13,8 @@ Then open http://localhost:8080/
 ## Debugging motion
 
 - Add `?motion=force` on localhost or 127.0.0.1 to run the hero graph even when
-  prefers-reduced-motion is set. Ignored on any other host.
+  prefers-reduced-motion is set. Ignored on any other host. `?motion=reduce` on the
+  same hosts forces the reduced-motion path for testing.
 - The same override exposes `window.__graph` with `positions()`, `energy()` and `fps()`.
   It is removed when the scene is disposed.
 - Ambient float amplitude, period range and depth wobble are the `AMBIENT_*` constants
@@ -65,7 +66,14 @@ node scripts/check-no-business.mjs
 ```
 
 It fails on commercial and advertising terms, and on the reserved sub-project
-segment in any shipped path.
+segment in any shipped path. It also reports gzipped first-party JS against a 12 KB budget.
+
+### Tests
+
+- `node tests/graph-regression.mjs` is a Playwright run and is not part of the deployed site.
+- It resolves Playwright from `import('playwright')` or the npx cache. First run once:
+  `npx --yes playwright@1.48.2 install chromium`.
+- It falls back to an installed Chrome or Edge when no bundled browser is found.
 
 ## Deploy
 
