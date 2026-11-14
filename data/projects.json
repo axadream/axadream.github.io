@@ -1,0 +1,18 @@
+[
+  {
+    "id": "openhorizon",
+    "type": "project",
+    "status": "released",
+    "label": "OpenHorizon",
+    "updated": "2026-11-11",
+    "url": "/OpenHorizon/"
+  },
+  {
+    "id": "next-ai-project",
+    "type": "project",
+    "status": "planned",
+    "label": "Next AI project: RAG or agent, with evals",
+    "title": "Next AI project",
+    "url": "#projects"
+  }
+]

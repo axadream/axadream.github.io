@@ -2,13 +2,16 @@
 // Guard: fails if commercial/ad terms or the reserved sub-project segment
 // appear in the shipped repo. Terms are assembled from parts so this file
 // does not contain them literally. Also checks version agreement, the
-// reserved-section flags in site.config.json, and external hosts in shipped
-// .html/.css/.js files. Node >= 18, no dependencies.
+// reserved-section flags in site.config.json, external hosts in shipped
+// .html/.css/.js files, log entry validity, build-log freshness, and the
+// admin/ host allowlist. Node >= 18, no dependencies.
 
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative, sep, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { spawnSync } from 'node:child_process';
+import { parseEntryFile, validateEntry } from './build-log.mjs';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const root = resolve(scriptDir, '..');
@@ -28,7 +31,7 @@ const terms = [
 
 const reservedSegment = ['Open', 'Horizon'].join('').toLowerCase();
 
-// Hosts that may appear in shipped .html/.css/.js files (archive/ and scripts/ excluded).
+// Hosts that may appear in shipped .html/.css/.js files (archive/, scripts/, admin/ excluded).
 const allowedHosts = new Set([
   'alepax.com',
   'github.com',
@@ -37,10 +40,20 @@ const allowedHosts = new Set([
   'www.w3.org',
 ]);
 
+// Hosts that the self-hosted CMS under admin/ may reference (check 8).
+const adminAllowedHosts = new Set([
+  'api.github.com',
+  'github.com',
+  'avatars.githubusercontent.com',
+  'raw.githubusercontent.com',
+  'alepax.com',
+]);
+
 // Everything outside skipDirs is scanned, including data/ and all .json files.
 const skipDirs = new Set(['.git', 'node_modules', '.claude', '_incoming', 'vendor']);
-const hostSkipDirs = new Set(['archive', 'scripts', 'vendor']);
+const hostSkipDirs = new Set(['archive', 'scripts', 'vendor', 'admin']);
 const hostExt = new Set(['.html', '.css', '.js']);
+const adminExt = new Set(['.html', '.yml', '.webmanifest', '.json']);
 const binaryExt = new Set(['.png', '.webp', '.jpg', '.ico', '.woff2']);
 
 const failures = [];
@@ -86,6 +99,20 @@ async function walk(dir) {
           const host = m[1].toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
           if (host && !allowedHosts.has(host)) {
             failures.push(`${rel}:${i + 1}: external host not allowed: ${m[0]}`);
+          }
+        }
+      }
+    }
+
+    // Admin host allowlist (8): backslashes are stripped so YAML regex escapes
+    // such as github\.com are read as the host they name.
+    if (adminExt.has(ext) && segments[0] === 'admin') {
+      const urlRe = /https?:\/\/([^/\s"'<>()`;,]+)/gi;
+      for (let i = 0; i < lines.length; i++) {
+        for (const m of lines[i].replace(/\\/g, '').matchAll(urlRe)) {
+          const host = m[1].toLowerCase().replace(/:\d+$/, '').replace(/\.$/, '');
+          if (host && !adminAllowedHosts.has(host)) {
+            failures.push(`${rel}:${i + 1}: admin host not allowed: ${m[0]}`);
           }
         }
       }
@@ -166,6 +193,35 @@ try {
   }
 } catch (e) {
   failures.push(`js budget: cannot read sources (${e.message})`);
+}
+
+// Log entries (6): every content/log/*.md must parse and validate against the schema.
+try {
+  const logDir = join(root, 'content', 'log');
+  const logFiles = (await readdir(logDir)).filter((f) => f.endsWith('.md')).sort();
+  for (const f of logFiles) {
+    let errs;
+    try {
+      errs = validateEntry(parseEntryFile(await readFile(join(logDir, f), 'utf8')));
+    } catch (e) {
+      errs = [e.message];
+    }
+    for (const err of errs) failures.push(`content/log/${f}: ${err}`);
+  }
+} catch (e) {
+  failures.push(`content/log: cannot read (${e.message})`);
+}
+
+// Build freshness (7): generated log outputs must match a fresh build.
+{
+  const check = spawnSync(process.execPath, [join(root, 'scripts', 'build-log.mjs'), '--check'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  if (check.status !== 0) {
+    const out = `${check.stdout || ''}${check.stderr || ''}`.trim().replace(/\s*\r?\n\s*/g, ' | ');
+    failures.push(`build up to date: node scripts/build-log.mjs --check exited ${check.status}: ${out}`);
+  }
 }
 
 if (failures.length > 0) {

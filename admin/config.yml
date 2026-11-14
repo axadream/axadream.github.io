@@ -1,0 +1,33 @@
+backend:
+  name: github
+  repo: axadream/axadream.github.io
+  branch: main
+media_folder: assets/img/log
+public_folder: /assets/img/log
+site_url: https://alepax.com
+display_url: https://alepax.com
+slug:
+  timezone: utc
+collections:
+  - name: log
+    label: Log
+    folder: content/log
+    create: true
+    extension: md
+    format: frontmatter
+    identifier_field: body
+    slug: "{{year}}{{month}}{{day}}T{{hour}}{{minute}}{{second}}Z-{{fields.body | truncate(40, '')}}"
+    summary: "{{ts}} {{tag}}: {{body}}"
+    sortable_fields:
+      fields: [ts, tag]
+      default:
+        field: ts
+        direction: Descending
+    fields:
+      - {label: Timestamp, name: ts, widget: datetime, format: 'YYYY-MM-DDTHH:mm:ssZ', date_format: 'YYYY-MM-DD', time_format: 'HH:mm', picker_utc: false, required: true}
+      - {label: Tag, name: tag, widget: select, options: ["AI Prompt Skill", "Manual Code", "3D Concept", "Math Concept"], required: true}
+      - {label: Minutes, name: minutes, widget: number, value_type: int, min: 1, max: 600, required: false}
+      - {label: Link, name: link, widget: string, pattern: ['^https://github\.com/axadream/.+', 'Must be a https://github.com/axadream/... URL'], required: false}
+      - {label: Project, name: project, widget: string, pattern: ['^[a-z0-9-]+$', 'lowercase id'], required: false}
+      - {label: Draft, name: draft, widget: boolean, default: false, required: false}
+      - {label: Text, name: body, widget: text, maxlength: 300, required: true}
