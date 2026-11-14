@@ -1,4 +1,4 @@
-import { project, fnv, stars, R, H, GR, GA, SC } from './graph-layout.js';
+import { project, fnv, stars, R, H, GR, GA, SC, isDrag, ambientOffset, clampToBox } from './graph-layout.js';
 const K = {
 	POINTER_RADIUS: 140,
 	POINTER_PULL: 22,
@@ -76,6 +76,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	const lines = new T.LineSegments(eg, new T.LineBasicMaterial({ vertexColors: true }));
 	[pts, lines, glow, nodes, halo].forEach((o) => { o.frustumCulled = false; sc.add(o); });
 	// px from the box centre, y down: home h, sim q, velocity v, force a, drawn X Y
+	const ox = F(N), oy = F(N); // per-node drag offset added to home, survives parallax and resize
 	const hx = F(N), hy = F(N), qx = F(N), qy = F(N), vx = F(N), vy = F(N), ax = F(N), ay = F(N);
 	const X = F(N), Y = F(N), Z = F(N), wp = F(N), pw = F(N), dm = F(N), hl = F(N), ss = F(N).fill(1);
 	const p1 = ns.map((n) => (fnv(n.id) % 628) / 100), p2 = ns.map((n) => ((fnv(n.id) >>> 9) % 628) / 100);
@@ -127,7 +128,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	const frame = (now) => {
 		raf = 0;
 		if (dead) return;
-		const live = !rm;
+		const live = !rm; // drift, parallax, pointer pull; physics always runs (drag + settle)
 		if (live && lr && now - lr < 1000 / fps() - 4) { sched(); return; }
 		const dt = lr ? min((now - lr) / 1000, 0.033) : 0.016;
 		lr = now;
@@ -145,13 +146,14 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 			hy[i] = -(p.y * cb - p.z * sb) * S;
 			Z[i] = p.z * cb + p.y * sb;
 		}
-		if (!live || init) { init = false; qx.set(hx); qy.set(hy); }
+		if (init) { init = false; qx.set(hx); qy.set(hy); }
 		wp.fill(0);
-		if (live) {
+		{
 			const hk = K.HOME_STIFFNESS, ek = (hk * K.EDGE_SPRING) / (1 - K.EDGE_SPRING), df = K.DAMPING ** (dt * 60);
 			for (let i = 0; i < N; i++) {
-				let tx = hx[i], ty = hy[i];
-				if (pin && !(drag && i === dn)) {
+				if (drag && i === dn) { ox[i] = clampToBox(px, W / 2, 12) - hx[i]; oy[i] = clampToBox(py, Ht / 2, 12) - hy[i]; }
+				let tx = hx[i] + ox[i], ty = hy[i] + oy[i];
+				if (live && pin && !(drag && i === dn)) {
 					const ex = px - hx[i], ey = py - hy[i], d = hypot(ex, ey) || 1;
 					wp[i] = 1 - sm(0, K.POINTER_RADIUS, d);
 					const m = min(d, K.POINTER_PULL) * wp[i];
@@ -171,8 +173,9 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 					}
 				}
 			}
+			const o = (i) => (drag && i === dn ? 0 : 1); // a released node keeps its offset without edge pull-back
 			E.forEach(([a, b]) => {
-				const ux = ek * (qx[a] - hx[a] - qx[b] + hx[b]), uy = ek * (qy[a] - hy[a] - qy[b] + hy[b]);
+				const ux = ek * (qx[a] - hx[a] - o(a) * ox[a] - qx[b] + hx[b] + o(b) * ox[b]), uy = ek * (qy[a] - hy[a] - o(a) * oy[a] - qy[b] + hy[b] + o(b) * oy[b]);
 				ax[a] -= ux; ay[a] -= uy; ax[b] += ux; ay[b] += uy;
 			});
 			en = 0;
@@ -191,10 +194,10 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 				en += vx[i] ** 2 + vy[i] ** 2 + (ax[i] / hk) ** 2 + (ay[i] / hk) ** 2;
 			}
 		}
-		const am = live ? min(1, t / 1.5) : 0;
+		const am = live ? min(1, t / 1.5) : 0, w = now / 1000; // drift uses wall time, not the throttled dt
 		for (let i = 0; i < N; i++) {
-			X[i] = qx[i] + am * K.AMBIENT_AMP * sin(om[i] * t + p1[i]);
-			Y[i] = qy[i] + am * K.AMBIENT_AMP * sin(om[i] * 1.3 * t + p2[i] * 2);
+			X[i] = clampToBox(qx[i] + ambientOffset(w, om[i], p1[i], K.AMBIENT_AMP, am), W / 2, 12);
+			Y[i] = clampToBox(qy[i] + ambientOffset(w, om[i] * 1.3, p2[i] * 2, K.AMBIENT_AMP, am), Ht / 2, 12);
 			zz[i] = am * sin(om[i] * 0.6 * t + p1[i] + p2[i]);
 			Z[i] += K.AMBIENT_Z * zz[i];
 		}
@@ -264,7 +267,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 			canvas.classList.add('is-ready');
 			box.classList.add('scene-on');
 		}
-		if (live) sched();
+		if (live || drag || en > K.ENERGY_EPS) sched();
 	};
 	const sched = () => { if (!raf && !dead && !pz && inView && !document.hidden) raf = requestAnimationFrame(frame); };
 	const stop = () => { if (raf) cancelAnimationFrame(raf); raf = 0; lr = 0; };
@@ -274,7 +277,7 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		rd.setSize(W, Ht, false);
 		const S0 = S;
 		S = min(W, Ht) / (2 * H);
-		for (let i = 0; i < N; i++) { qx[i] *= S / S0; qy[i] *= S / S0; }
+		for (let i = 0; i < N; i++) { qx[i] *= S / S0; qy[i] *= S / S0; ox[i] *= S / S0; oy[i] *= S / S0; }
 		cam.right = W / 2 / S;
 		cam.left = -cam.right;
 		cam.top = Ht / 2 / S;
@@ -290,14 +293,16 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 		py = e.clientY - r.top - r.height / 2;
 	};
 	on(box, 'pointermove', (e) => {
-		if (e.pointerType === 'touch') return;
+		const tch = e.pointerType === 'touch';
+		if (tch && dn < 0) return;
 		rel(e);
-		pin = true;
-		sel = -1;
+		if (!tch) pin = true;
+		if (!tch || drag) sel = -1;
 		lastMove = performance.now();
-		if (dn >= 0 && !drag && hypot(px - sx0, py - sy0) > K.DRAG_THRESHOLD) {
+		if (dn >= 0 && !drag && isDrag(px - sx0, py - sy0, K.DRAG_THRESHOLD)) {
 			drag = true;
-			try { box.setPointerCapture(cp = e.pointerId); } catch (x) { /* ignore */ }
+			sel = -1;
+			if (cp < 0) try { box.setPointerCapture(cp = e.pointerId); } catch (x) { /* ignore */ }
 		}
 		sched();
 	});
@@ -305,13 +310,30 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	on(box, 'pointerdown', (e) => {
 		pt = e.pointerType;
 		sup = false;
-		if (rm || pt === 'touch') return;
+		dn = -1;
+		if (lab.contains(e.target)) return;
 		rel(e);
 		sx0 = px;
 		sy0 = py;
 		dn = near(K.HIT_RADIUS);
+		if (dn >= 0 && pt === 'touch') try { box.setPointerCapture(cp = e.pointerId); } catch (x) { /* ignore */ }
 	});
-	const up = () => { sup = drag; drag = false; dn = cp = -1; sched(); };
+	// touchstart on a node must not start a page pan; the tap is then resolved on pointerup (no click follows)
+	const ts = (e) => {
+		if (e.touches.length !== 1 || lab.contains(e.target)) return;
+		rel(e.touches[0]);
+		if (near(K.HIT_RADIUS) >= 0 && e.cancelable) e.preventDefault();
+	};
+	box.addEventListener('touchstart', ts, { passive: false });
+	offs.push(() => box.removeEventListener('touchstart', ts));
+	const up = (e) => {
+		const tap = pt === 'touch' && !drag && dn >= 0;
+		sup = drag;
+		drag = false;
+		dn = cp = -1;
+		if (tap) { rel(e); lastMove = performance.now(); sel = near(K.HIT_RADIUS * 1.4); }
+		sched();
+	};
 	const rs = () => {
 		try { if (cp >= 0) box.releasePointerCapture(cp); } catch (x) { /* ignore */ }
 		cp = dn = -1;

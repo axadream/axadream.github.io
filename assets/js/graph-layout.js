@@ -55,6 +55,11 @@ function edges(ns) {
 	return out;
 }
 
+// Pure motion helpers (unit-tested, used by graph-scene.js).
+export const isDrag = (dx, dy, thr) => Math.hypot(dx, dy) >= thr;
+export const ambientOffset = (t, omega, phase, amp, ramp) => ramp * amp * Math.sin(omega * t + phase);
+export const clampToBox = (v, half, pad) => Math.min(half - pad, Math.max(pad - half, v));
+
 export const days = (d, now) => Math.floor((+now - Date.parse(d)) / 864e5);
 
 function tier(d, now) {

@@ -127,6 +127,10 @@ node scripts/check-no-business.mjs
 
 It fails on commercial and advertising terms, and on the reserved sub-project
 segment in any shipped path. It also reports gzipped first-party JS against a 12 KB budget.
+Stale generated outputs (the `index.html` log region, `log/index.html`, `data/nodes.json`)
+only WARN by default, because markdown-only post commits may leave them stale; CI rebuilds them.
+The exit code is unchanged. `--strict` makes stale outputs FAIL (exit 1).
+Code changes must run `node scripts/build-log.mjs`, then `node scripts/check-no-business.mjs --strict`, before commit.
 
 ### Tests
 
