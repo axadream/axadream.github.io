@@ -4,6 +4,16 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-11-14
+
+### Fixed
+
+- Graph: node drift is independent of the throttled frame loop and clamped to the graph area.
+- Graph: touch drag enabled; a dragged node stays where it is released; with reduced motion drift is off but drag still works.
+
+### Changed
+
+- README: guard WARN/--strict policy.
 ## [1.1.2] - 2026-11-14
 
 ### Changed

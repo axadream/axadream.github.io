@@ -138,13 +138,34 @@ try {
 		await ctx.close();
 	}
 
-	// (D) reduced motion: no drag, no energy
+	// (D) reduced motion: no drift, drag still works, node stays put, loop goes idle
 	{
 		const { ctx, page } = await openPage({ reducedMotion: 'reduce' }, 'reduce');
 		const up = await ready(page);
-		let moved = 99, en = -1;
-		if (up) { await sleep(1500); moved = (await dragNode(page)).moved; en = await page.evaluate(() => window.__graph.energy()); }
-		report('D reduced motion: no drag, energy 0', up && moved <= 5 && en === 0, `moved=${moved.toFixed?.(1)} energy=${en}`);
+		let still = 99, moved = 0, kept = 99, en = -1;
+		if (up) {
+			await sleep(1500);
+			const p1 = await pos(page);
+			await sleep(1500);
+			const p2 = await pos(page);
+			still = Math.max(...Object.keys(p1).map((k) => dist(p1[k], p2[k])));
+			const t = await target(page);
+			const box = await page.evaluate(() => { const r = document.getElementById('hero-box').getBoundingClientRect(); return [r.left, r.top]; });
+			const [x, y] = t.client;
+			await page.mouse.move(x, y);
+			await page.mouse.down();
+			for (let i = 1; i <= 6; i++) await page.mouse.move(x + (80 * i) / 6, y);
+			await sleep(500);
+			await page.mouse.up();
+			await sleep(1200);
+			const a = (await pos(page))[t.id];
+			moved = dist([a[0] + box[0], a[1] + box[1]], t.client);
+			await sleep(1500);
+			const b = (await pos(page))[t.id];
+			kept = dist(a, b);
+			en = await page.evaluate(() => window.__graph.energy());
+		}
+		report('D reduced motion: no drift, drag works and stays', up && still < 0.05 && moved > 40 && kept < 0.5 && en < 0.05, `still=${still.toFixed?.(2)} moved=${moved.toFixed?.(1)} kept=${kept.toFixed?.(2)} energy=${en}`);
 		await ctx.close();
 	}
 } finally {
