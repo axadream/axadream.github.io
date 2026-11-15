@@ -1,5 +1,7 @@
 ---
 ts: 2026-11-08T10:00:00Z
-tag: Cooking
+made: Manual
+track: Math
+tag: Manual Code
 ---
-Bad tag.
+Old tag key.

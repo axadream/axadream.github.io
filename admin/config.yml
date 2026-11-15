@@ -17,17 +17,24 @@ collections:
     format: frontmatter
     identifier_field: body
     slug: "{{year}}{{month}}{{day}}T{{hour}}{{minute}}{{second}}Z-{{fields.body | truncate(40, '')}}"
-    summary: "{{ts}} {{tag}}: {{body}}"
+    summary: "{{ts}} {{made}} {{track}}: {{body}}"
     sortable_fields:
-      fields: [ts, tag]
+      fields: [ts, made, track]
       default:
         field: ts
         direction: Descending
     fields:
       - {label: Timestamp, name: ts, widget: datetime, format: 'YYYY-MM-DDTHH:mm:ssZ', date_format: 'YYYY-MM-DD', time_format: 'HH:mm', picker_utc: false, required: true}
-      - {label: Tag, name: tag, widget: select, options: ["AI Prompt Skill", "Manual Code", "3D Concept", "Math Concept"], required: true}
+      - {label: Made, name: made, widget: select, options: ["AI-guided", "Manual", "Mixed"], required: true}
+      - {label: Track, name: track, widget: select, options: ["App", "AI Study", "Math", "3D"], required: true}
+      - label: Cards
+        name: cards
+        widget: list
+        label_singular: Card
+        required: false
+        field: {label: Card, name: card, widget: string, pattern: ['^L[0-9]-[0-9]{3}$', 'Format L<n>-<nnn>, e.g. L1-001'], required: false}
+      - {label: Proof, name: proof, widget: string, pattern: ['^https://(github\.com/axadream/|alepax\.com/).+', 'GitHub (axadream), alepax.com or axadream.github.io link'], hint: 'GitHub (axadream), alepax.com or axadream.github.io link', required: false}
+      - {label: Prompt trace, name: trace, widget: markdown, maxlength: 1500, required: false}
       - {label: Minutes, name: minutes, widget: number, value_type: int, min: 1, max: 600, required: false}
-      - {label: Link, name: link, widget: string, pattern: ['^https://github\.com/axadream/.+', 'Must be a https://github.com/axadream/... URL'], required: false}
-      - {label: Project, name: project, widget: string, pattern: ['^[a-z0-9-]+$', 'lowercase id'], required: false}
       - {label: Draft, name: draft, widget: boolean, default: false, required: false}
       - {label: Text, name: body, widget: text, maxlength: 300, required: true}

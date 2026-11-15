@@ -17,10 +17,13 @@ assert.equal(TOKEN.length, 20);
 
 const entry = (over = {}) => ({
   ts: '2026-11-12T20:00:00+01:00',
-  tag: 'Manual Code',
+  made: 'Manual',
+  track: 'Math',
   text: 'Wrote the log-post tests.',
+  cards: ['L1-001', 'L2-010'],
+  proof: 'https://github.com/axadream/axadream.github.io/commit/abc123',
+  trace: 'First line of the trace.\n\nSecond paragraph.',
   minutes: 45,
-  link: 'https://github.com/axadream/axadream.github.io/commit/abc123',
   ...over,
 });
 
@@ -62,16 +65,32 @@ test('renderFile output parses and validates with build-log and log-post', () =>
   const parsed = parseEntryFile(file);
   assert.deepEqual(validateBuildEntry(parsed), []);
   assert.deepEqual(validateEntry(e), []);
+  assert.equal(parsed.made, 'Manual');
+  assert.equal(parsed.track, 'Math');
+  assert.deepEqual(parsed.cards, ['L1-001', 'L2-010']);
+  assert.equal(parsed.proof, e.proof);
+  assert.equal(parsed.trace, e.trace);
   assert.equal(parsed.minutes, 45);
-  assert.equal(parsed.link, e.link);
   assert.equal(parsed.text, e.text);
+  assert.equal(parsed.tag, undefined);
+  assert.equal(parsed.link, undefined);
+
+  const bare = parseEntryFile(renderFile(entry({ cards: undefined, proof: undefined, trace: undefined, minutes: undefined })));
+  assert.deepEqual(validateBuildEntry(bare), []);
+  assert.equal(bare.cards, undefined);
 });
 
-test('validateEntry rejects bad tag, long text, missing offset and foreign link', () => {
-  assert.match(validateEntry(entry({ tag: 'Nope' })).join(), /"tag" must be one of/);
+test('validateEntry rejects bad made, bad track, bad card, bad proof, long text, missing offset', () => {
+  assert.match(validateEntry(entry({ made: 'Nope' })).join(), /"made" must be one of/);
+  assert.match(validateEntry(entry({ track: 'Nope' })).join(), /"track" must be one of/);
+  assert.match(validateEntry(entry({ cards: ['L1-01'] })).join(), /"cards" item "L1-01" does not match/);
+  assert.match(validateEntry(entry({ proof: 'https://evil.example.com/x' })).join(), /"proof" does not match/);
   assert.match(validateEntry(entry({ text: 'x'.repeat(301) })).join(), /longer than 300/);
+  assert.match(validateEntry(entry({ trace: 'x'.repeat(1501) })).join(), /"trace" longer than 1500/);
   assert.match(validateEntry(entry({ ts: '2026-11-12T20:00:00' })).join(), /"ts" does not match/);
-  assert.match(validateEntry(entry({ link: 'https://evil.example.com/x' })).join(), /"link" does not match/);
+  const bad = validateEntry(entry({ made: undefined, track: undefined }));
+  assert.match(bad.join(), /missing required field "made"/);
+  assert.match(bad.join(), /missing required field "track"/);
 });
 
 test('checkAllow: inside and equal paths pass; outside and missing file refuse', () => {
@@ -104,12 +123,12 @@ test('checkDeny: case-insensitive hit on text and on link, no hit otherwise', ()
   const home = tempDir();
   try {
     writeFileSync(join(home, 'deny-terms.txt'), '# terms\nSecretWord\n');
-    const onText = checkDeny(entry({ text: 'a secretword here', link: undefined }), home);
+    const onText = checkDeny(entry({ text: 'a secretword here', proof: undefined }), home);
     assert.equal(onText.ok, false);
     assert.equal(onText.field, 'text');
-    const onLink = checkDeny(entry({ link: 'https://github.com/axadream/SECRETWORD' }), home);
+    const onLink = checkDeny(entry({ proof: 'https://github.com/axadream/SECRETWORD' }), home);
     assert.equal(onLink.ok, false);
-    assert.equal(onLink.field, 'link');
+    assert.equal(onLink.field, 'proof');
     assert.equal(checkDeny(entry(), home).ok, true);
   } finally {
     rmSync(home, { recursive: true, force: true });

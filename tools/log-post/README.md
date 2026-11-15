@@ -30,8 +30,8 @@ Token: `$env:ALEPAX_LOG_TOKEN = '<token>'` (fine-grained PAT, repo axadream.gith
 
 | Flag | Meaning |
 |---|---|
-| `--text --tag` | required entry text (max 300) and tag |
-| `--minutes --link --project --draft` | optional fields |
+| `--text --made --track` | required entry text (max 300), made (`AI-guided`, `Manual`, `Mixed`) and track (`App`, `AI Study`, `Math`, `3D`) |
+| `--cards --proof --trace --minutes --draft` | optional fields (`--cards` comma-separated `L<n>-<nnn>`; `--proof` github.com/axadream or alepax.com https URL; `--trace` max 1500) |
 | `--ts` | ISO 8601 with offset (default: now, local offset) |
 | `--cwd` | directory checked against the allowlist |
 | `--dry` | preview, exit 0, no token or network |
@@ -43,7 +43,7 @@ Exit codes: 0 ok, 1 API 4xx, 2 queued/offline, 3 preview only, 4 refused, 5 toke
 
 ## Examples
 
-    node post.mjs --dry --text "Rebuilt the loop" --tag "Manual Code"
-    node post.mjs --text "Rebuilt the loop" --tag "Manual Code" --minutes 25
-    node post.mjs --text "Rebuilt the loop" --tag "Manual Code" --minutes 25 --yes --ts 2026-11-12T21:03:05+01:00
+    node post.mjs --dry --text "Rebuilt the loop" --made Manual --track App
+    node post.mjs --text "Rebuilt the loop" --made Manual --track App --cards L1-001 --minutes 25
+    node post.mjs --text "Rebuilt the loop" --made Manual --track App --minutes 25 --yes --ts 2026-11-12T21:03:05+01:00
     node post.mjs --flush

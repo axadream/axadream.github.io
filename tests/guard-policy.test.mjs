@@ -1,6 +1,6 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, cpSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, cpSync, writeFileSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -16,6 +16,10 @@ function makeCopy() {
   const dir = mkdtempSync(join(tmpdir(), 'alepax-guard-'));
   created.push(dir);
   cpSync(repo, dir, { recursive: true, filter: (src) => !skip.test(src) });
+  // Use schema v2 fixtures as the log content so these tests do not depend on the live posts' schema.
+  rmSync(join(dir, 'content', 'log'), { recursive: true, force: true });
+  mkdirSync(join(dir, 'content', 'log'), { recursive: true });
+  for (const f of ['valid.md', 'valid-west.md']) cpSync(join(here, 'fixtures', 'log', f), join(dir, 'content', 'log', f));
   return dir;
 }
 
@@ -51,7 +55,7 @@ test('stale build outputs: default warns and passes, strict fails', () => {
   // Add a valid new entry without rebuilding, so build-log --check reports stale.
   writeFileSync(
     join(dir, 'content', 'log', '20261201T190000Z-stale-probe.md'),
-    '---\nts: 2026-12-01T20:00:00+01:00\ntag: Manual Code\n---\nStale probe entry.\n',
+    '---\nts: 2026-12-01T20:00:00+01:00\nmade: Manual\ntrack: Math\n---\nStale probe entry.\n',
     'utf8'
   );
 

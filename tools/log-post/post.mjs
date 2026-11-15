@@ -4,8 +4,9 @@
 // Standalone, Node 18+, node: builtins only. Copied to ~/.claude/skills/log-post/.
 //
 // Usage:
-//   node post.mjs --text "..." --tag "Manual Code" [--minutes N] [--link URL]
-//        [--project ID] [--draft] [--ts ISO] [--cwd DIR] [--dry] [--yes] [--json]
+//   node post.mjs --text "..." --made Manual --track Math [--cards L1-001,L2-003]
+//        [--proof URL] [--trace "..."] [--minutes N] [--draft] [--ts ISO] [--cwd DIR]
+//        [--dry] [--yes] [--json]
 //   node post.mjs --flush        retry queued entries from pending/
 //   node post.mjs --help
 // Without --yes (and without --dry) it only previews and exits 3.
@@ -40,10 +41,14 @@ export function nowIso(d = new Date()) {
 
 /** Build an entry object from parsed CLI args (only set keys that were given). */
 export function buildEntry(args) {
-  const e = { ts: args.ts || nowIso(), tag: args.tag, text: args.text };
+  const e = { ts: args.ts || nowIso(), made: args.made, track: args.track, text: args.text };
+  if (args.cards) {
+    const ids = String(args.cards).split(',').map((s) => s.trim()).filter(Boolean);
+    if (ids.length) e.cards = ids;
+  }
+  if (args.proof) e.proof = args.proof;
+  if (args.trace) e.trace = args.trace;
   if (args.minutes !== undefined) e.minutes = /^-?\d+$/.test(String(args.minutes)) ? Number(args.minutes) : args.minutes;
-  if (args.link !== undefined) e.link = args.link;
-  if (args.project !== undefined) e.project = args.project;
   if (args.draft) e.draft = true;
   for (const k of Object.keys(e)) if (e[k] === undefined) delete e[k];
   return e;
@@ -63,6 +68,14 @@ export function validateEntry(obj) {
       continue;
     }
     if (v === undefined || (v === '' && (SCHEMA.required || []).includes(k))) continue;
+    if (p.type === 'array') {
+      if (!Array.isArray(v)) { errs.push(`"${k}" must be a list`); continue; }
+      for (const it of v) {
+        if (typeof it !== 'string') errs.push(`"${k}" items must be strings`);
+        else if (p.items && p.items.pattern && !new RegExp(p.items.pattern).test(it)) errs.push(`"${k}" item "${it}" does not match ${p.items.pattern}`);
+      }
+      continue;
+    }
     const typeOk = p.type === 'integer' ? Number.isInteger(v) : typeof v === p.type;
     if (!typeOk) { errs.push(`"${k}" must be ${p.type}`); continue; }
     if (p.enum && !p.enum.includes(v)) errs.push(`"${k}" must be one of: ${p.enum.join(', ')}`);
@@ -132,10 +145,17 @@ const yamlVal = (v) => {
 
 /** Render the Markdown file with front matter. */
 export function renderFile(entry) {
-  const l = ['---', `ts: ${yamlVal(entry.ts)}`, `tag: ${yamlVal(entry.tag)}`];
+  const l = ['---', `ts: ${yamlVal(entry.ts)}`, `made: ${yamlVal(entry.made)}`, `track: ${yamlVal(entry.track)}`];
+  if (entry.cards !== undefined) {
+    l.push('cards:');
+    for (const c of entry.cards) l.push(`  - ${yamlVal(c)}`);
+  }
+  if (entry.proof !== undefined) l.push(`proof: ${yamlVal(entry.proof)}`);
+  if (entry.trace !== undefined) {
+    l.push('trace: |-');
+    for (const line of String(entry.trace).split(/\r?\n/)) l.push(line.trim() === '' ? '' : `  ${line}`);
+  }
   if (entry.minutes !== undefined) l.push(`minutes: ${entry.minutes}`);
-  if (entry.link !== undefined) l.push(`link: ${yamlVal(entry.link)}`);
-  if (entry.project !== undefined) l.push(`project: ${yamlVal(entry.project)}`);
   if (entry.draft) l.push('draft: true');
   l.push('---', '', String(entry.text), '');
   return l.join('\n');
@@ -217,7 +237,7 @@ export async function flush({ token, fetch: f, pendingDir = pendingDirDefault() 
 
 function parseArgs(argv) {
   const a = {};
-  const val = new Set(['text', 'tag', 'minutes', 'link', 'project', 'ts', 'cwd']);
+  const val = new Set(['text', 'made', 'track', 'cards', 'proof', 'trace', 'minutes', 'ts', 'cwd']);
   const flag = new Set(['draft', 'dry', 'yes', 'flush', 'json', 'help']);
   for (let i = 0; i < argv.length; i++) {
     const m = /^--([a-z]+)$/.exec(argv[i]);
@@ -231,8 +251,9 @@ function parseArgs(argv) {
   return a;
 }
 
-const HELP = `Usage: node post.mjs --text "..." --tag "Manual Code" [--minutes N] [--link URL]
-       [--project ID] [--draft] [--ts ISO] [--cwd DIR] [--dry] [--yes] [--json]
+const HELP = `Usage: node post.mjs --text "..." --made "AI-guided|Manual|Mixed" --track "App|AI Study|Math|3D"
+       [--cards L1-001,L2-003] [--proof URL] [--trace "..."] [--minutes N] [--draft]
+       [--ts ISO] [--cwd DIR] [--dry] [--yes] [--json]
        node post.mjs --flush
 Without --yes the entry is only previewed (exit 3). --dry previews and exits 0.
 Exit: 0 ok, 1 API error, 2 queued, 3 preview, 4 refused, 5 token missing.`;
@@ -244,15 +265,17 @@ const TOKEN_HELP = `ALEPAX_LOG_TOKEN is not set. Create a token:
 Then in PowerShell: $env:ALEPAX_LOG_TOKEN = '<token>'`;
 
 function preview(entry, name, file) {
-  const o = (v) => (v === undefined ? '(none)' : v);
+  const o = (v) => (v === undefined ? '(none)' : Array.isArray(v) ? v.join(', ') : v);
   return [
     'PREVIEW (nothing posted)',
     `  ts:       ${entry.ts}`,
-    `  tag:      ${entry.tag}`,
+    `  made:     ${entry.made}`,
+    `  track:    ${entry.track}`,
     `  text:     ${entry.text}`,
+    `  cards:    ${o(entry.cards)}`,
+    `  proof:    ${o(entry.proof)}`,
+    `  trace:    ${entry.trace === undefined ? '(none)' : `${entry.trace.length} chars`}`,
     `  minutes:  ${o(entry.minutes)}`,
-    `  link:     ${o(entry.link)}`,
-    `  project:  ${o(entry.project)}`,
     `  draft:    ${entry.draft ? 'true' : 'false'}`,
     `  file:     content/log/${name}`,
     `  target:   ${REPO} @ main (GitHub Contents API)`,
