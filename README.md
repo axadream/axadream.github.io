@@ -48,13 +48,13 @@ Use the CMS at https://alepax.com/admin/ (on localhost, `/admin/` of the local s
 
 1. Choose **Sign In Using Access Token** and paste a token (see below).
 2. Open the **Log** collection and click **New Log**.
-3. Fields: **Timestamp** and **Tag** and **Text** are required. **Text** is plain
-   text, at most 300 characters, no Markdown. **Minutes** is 1-600. **Link** must
-   start with `https://github.com/axadream/`. **Project** is a lowercase id from
-   `data/projects.json`. **Draft** entries are skipped by the build.
-4. Tags: **AI Prompt Skill** is time spent prompting or steering an AI. **Manual Code**
-   is hand-written code. **3D Concept** is 3D modelling or animation study. **Math Concept**
-   is mathematics study.
+3. Fields: **Timestamp**, **Made**, **Track** and **Text** are required. **Text** is plain
+   text, at most 300 characters, no Markdown. **Cards** are handbook IDs like `L1-001`.
+   **Proof** must start with `https://github.com/axadream/` or `https://alepax.com/`.
+   **Prompt trace** is Markdown, at most 1500 characters. **Minutes** is 1-600.
+   **Draft** entries are skipped by the build.
+4. Made: **AI-guided** is code the AI wrote from your spec. **Manual** is every line typed
+   by you. **Mixed** is anything in between. Track: **App**, **AI Study**, **Math** or **3D**.
 5. The CMS saves `content/log/<YYYYMMDDTHHMMSSZ>-<slug>.md`. The slug is the first
    40 characters of the text.
 
@@ -63,7 +63,8 @@ By hand, add `content/log/<YYYYMMDDTHHMMSSZ>-<slug>.md`:
 ```markdown
 ---
 ts: 2026-11-12T20:00:00+01:00
-tag: Manual Code
+made: Manual
+track: Math
 minutes: 45
 ---
 Short plain-text summary, at most 300 characters.

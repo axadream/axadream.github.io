@@ -34,7 +34,8 @@ export async function startScene(canvas, { layout: L, box, list, reducedMotion: 
 	const bg = css('--graph-bg', '#0B0E14');
 	const white = new T.Color(1, 1, 1);
 	const ns = L.nodes, E = L.edges, N = ns.length;
-	const cols = ns.map((n) => tiers[n.tier]);
+	const trk = { app: css('--track-app', '#F2A65A'), 'ai-study': css('--track-ai-study', '#9B8CFF'), math: css('--track-math', '#6FD08C'), '3d': css('--track-3d', '#FF7A9C') };
+	const cols = ns.map((n) => (n.type === 'log' && trk[n.track]) || tiers[n.tier]);
 	const sz = ns.map((n) => R * n.size);
 	const pln = ns.map((n) => n.tier === 'planned');
 	const adj = ns.map(() => new Set());

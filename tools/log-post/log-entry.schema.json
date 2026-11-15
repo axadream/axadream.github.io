@@ -4,7 +4,7 @@
   "title": "Log entry",
   "type": "object",
   "additionalProperties": false,
-  "required": ["ts", "tag", "text"],
+  "required": ["ts", "made", "track", "text"],
   "properties": {
     "ts": {
       "type": "string",
@@ -12,9 +12,13 @@
       "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$",
       "description": "ISO 8601 with offset"
     },
-    "tag": {
+    "made": {
       "type": "string",
-      "enum": ["AI Prompt Skill", "Manual Code", "3D Concept", "Math Concept"]
+      "enum": ["AI-guided", "Manual", "Mixed"]
+    },
+    "track": {
+      "type": "string",
+      "enum": ["App", "AI Study", "Math", "3D"]
     },
     "text": {
       "type": "string",
@@ -22,20 +26,26 @@
       "maxLength": 300,
       "description": "Plain text, the Markdown file body; no markup"
     },
+    "cards": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^L[0-9]-[0-9]{3}$" },
+      "description": "Handbook card IDs"
+    },
+    "proof": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://(github\\.com/axadream/|alepax\\.com/).+",
+      "description": "GitHub (axadream) or alepax.com link"
+    },
+    "trace": {
+      "type": "string",
+      "maxLength": 1500,
+      "description": "Prompt trace, markdown, shown collapsed"
+    },
     "minutes": {
       "type": "integer",
       "minimum": 1,
       "maximum": 600
-    },
-    "link": {
-      "type": "string",
-      "format": "uri",
-      "pattern": "^https://github\\.com/axadream/.+"
-    },
-    "project": {
-      "type": "string",
-      "pattern": "^[a-z0-9-]+$",
-      "description": "project node id from data/projects.json"
     },
     "draft": {
       "type": "boolean"

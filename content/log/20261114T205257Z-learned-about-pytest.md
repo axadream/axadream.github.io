@@ -1,9 +1,8 @@
 ---
 ts: 2026-11-14T15:53:00+02:00
-tag: AI Prompt Skill
+made: AI-guided
+track: App
 minutes: 65
-link: ''
-project: ''
 draft: false
 ---
 

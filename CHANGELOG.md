@@ -4,6 +4,29 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-11-15
+
+### Added
+
+- Log schema v2 fields: `made`, `track`, `cards`, `proof`, `trace`.
+- `handbook_base` site config key.
+- Log legend and a Start-here block.
+- Made badges and track colours; graph nodes are coloured by track.
+
+### Changed
+
+- `link` is renamed `proof` and restricted to github.com/axadream/ and alepax.com/ links.
+- CMS and log-post tool updated for schema v2.
+- build-log fails the build on front-matter parse errors and invalid entries.
+
+### Removed
+
+- `tag` and `project` fields.
+
+### Notes
+
+- Accepted deviations: the poster keeps tier colours (no `tr-<track>` class); the log-to-project edge in `graph-layout.js` is now inert; `nodes.json` stores track slugs `app`, `ai-study`, `math`, `3d`; recency on log nodes is now only the <=7-day halo, since colour comes from track.
+
 ## [1.1.4] - 2026-11-14
 
 ### Fixed
