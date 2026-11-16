@@ -10,6 +10,12 @@ python -m http.server 8080
 
 Then open http://localhost:8080/
 
+## Hero graph buttons
+
+- "Play the graph" loads the 3D scene on first click and turns into "Running" (pressed).
+- "Reload" appears while running and rebuilds the scene on a fresh canvas. If the
+  rebuild fails, the button returns to "Play the graph" and the label shows an error.
+
 ## Debugging motion
 
 - Add `?motion=force` on localhost or 127.0.0.1 to run the hero graph even when

@@ -151,7 +151,7 @@ if (!reduced) {
 		cv.replaceWith(n);
 		cv = n;
 		box.classList.remove('scene-on');
-		start();
+		return start();
 	};
 
 	window.addEventListener('pagehide', (e) => {
@@ -184,5 +184,7 @@ if (!reduced) {
 		play.disabled = false;
 		if (!ok) { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; }
 	});
-	if (rl) rl.addEventListener('click', rebuild);
+	if (rl) rl.addEventListener('click', async () => {
+		if (!(await rebuild())) { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; }
+	});
 })();

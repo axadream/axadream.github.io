@@ -201,6 +201,27 @@ try {
 		report('D reduced motion: no drift, drag works and stays', up && still < 0.05 && moved > 40 && kept < 0.5 && en < 0.05, `still=${still.toFixed?.(2)} moved=${moved.toFixed?.(1)} kept=${kept.toFixed?.(2)} energy=${en}`);
 		await ctx.close();
 	}
+
+	// (F) Play -> Running state; Reload rebuilds the scene (positions change) without a second three.module request
+	{
+		const { ctx, page, urls } = await openPage();
+		await page.locator('#graph-play').click();
+		const up = await ready(page);
+		await sleep(500);
+		const state = await page.evaluate(() => ({ text: document.getElementById('graph-play').textContent.trim(), pressed: document.getElementById('graph-play').getAttribute('aria-pressed'), reloadVisible: !document.getElementById('graph-reload').hidden }));
+		report('F Play shows Running, pressed, Reload visible', up && state.text === 'Running' && state.pressed === 'true' && state.reloadVisible, JSON.stringify(state));
+		const p0 = up ? await pos(page) : {};
+		await page.locator('#graph-reload').click();
+		await sleep(300);
+		const up2 = await ready(page);
+		await sleep(500);
+		const p1 = up2 ? await pos(page) : {};
+		const changed = Object.keys(p0).filter((k) => p1[k] && dist(p0[k], p1[k]) > 0.05).length;
+		report('F Reload rebuilds: at least one node position changed', up2 && changed >= 1, `graph=${up2} changed=${changed}`);
+		const three = threeHits(urls);
+		report('F exactly one three.module request after Reload', three === 1, `three=${three}`);
+		await ctx.close();
+	}
 } finally {
 	await browser.close();
 	server.close();
