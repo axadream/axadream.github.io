@@ -4,15 +4,20 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-11-16
+
+### Changed
+
+- The footer shows © <year> Alex Pintea · v<version> with no exact date; the year is computed at build time from the newest non-draft log-entry timestamp.
+- OG images use a deliberate two-line about subtitle broken at the ·, and the name margin is reduced so at least 32 px sit above alepax.com; the subtitle is 48 px. The about OG kicker stays hidden.
+
 ## [1.9.1] - 2026-11-16
 
 ### Changed
 
-- og-about: subtitle now reads "Industrial IT & MES Consultant" over "Building in applied AI and 3D"; the duplicate ABOUT kicker is hidden on that card.
+- og-about: subtitle now reads "Industrial IT & MES Consultant · Building in applied AI and 3D"; the duplicate ABOUT kicker is hidden on that card.
 - og-home regenerated (same subtitle "Applied AI, math and 3D, built in public").
 - /about/ is marked `og:type` profile with `profile:first_name` Alex and `profile:last_name` Pintea.
-- The footer shows "© <year> Alex Pintea · v<version>" with no exact date; the year is computed at build time from the newest content timestamp.
-- OG images use a deliberate two-line subtitle (about) and more breathing room above alepax.com.
 
 ## [1.9.0] - 2026-11-16
 
