@@ -43,15 +43,11 @@ export const stars = () => {
 
 function edges(ns) {
 	const out = [];
-	const idx = new Map(ns.map((n, i) => [n.id, i]));
 	const ids = (t) => ns.map((n, i) => i).filter((i) => ns[i].type === t);
 	const logs = ids('log').sort((a, b) => (ns[a].date < ns[b].date ? -1 : 1));
 	const pr = ids('project');
 	for (let k = 1; k < logs.length; k++) out.push([logs[k - 1], logs[k]]);
 	for (let k = 1; k < pr.length; k++) out.push([pr[k - 1], pr[k]]);
-	ns.forEach((n, i) => {
-		if (n.type === 'log' && idx.has(n.project)) out.push([i, idx.get(n.project)]);
-	});
 	return out;
 }
 

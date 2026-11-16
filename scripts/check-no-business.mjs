@@ -4,7 +4,8 @@
 // does not contain them literally. Also checks version agreement, the
 // reserved-section flags in site.config.json, external hosts in shipped
 // .html/.css/.js files, log entry validity, build-log freshness, and the
-// admin/ host allowlist. Node >= 18, no dependencies.
+// admin/ host allowlist, and that graph chunks load only behind a user action.
+// Node >= 18, no dependencies.
 
 import { readdir, readFile } from 'node:fs/promises';
 import { dirname, join, relative, sep, resolve } from 'node:path';
@@ -166,7 +167,8 @@ try {
   failures.push(`index.html: cannot read (${e.message})`);
 }
 
-// JS budget (5): gzipped first-party JS plus the classic inline <script> in <head>.
+// JS budget (5): per page: first-party gzipped JS <= 12,288 B, and no chunk may load
+// without a user action. Counts gzipped first-party JS plus the classic inline <script> in <head>.
 const JS_GZIP_BUDGET = 12288;
 const JS_RAW_WARN = 24000;
 try {
@@ -187,13 +189,43 @@ try {
   const raw = parts.reduce((n, s) => n + Buffer.byteLength(s, 'utf8'), 0);
   console.log(`guard: js gzipped ${gz} B of ${JS_GZIP_BUDGET} B (raw ${raw} B)`);
   if (gz > JS_GZIP_BUDGET) {
-    failures.push(`js budget: gzipped ${gz} B exceeds ${JS_GZIP_BUDGET} B`);
+    failures.push(
+      `js budget: per page first-party gzipped JS is ${gz} B, over the ${JS_GZIP_BUDGET} B (12,288 B) limit`
+    );
   }
   if (raw > JS_RAW_WARN) {
     console.log(`WARNING: js raw ${raw} B exceeds ${JS_RAW_WARN} B (warning only)`);
   }
 } catch (e) {
   failures.push(`js budget: cannot read sources (${e.message})`);
+}
+
+// Load gate (8): per page, no chunk may load without a user action. index.html must
+// not reference the graph chunks at all; assets/js/site.js may reference them only on
+// a line carrying the /* user-action-load */ marker.
+const LAZY_REFS = ['graph-scene.js', 'three.module'];
+const LAZY_MARKER = '/* user-action-load */';
+try {
+  const html = await readFile(join(root, 'index.html'), 'utf8');
+  for (const ref of LAZY_REFS) {
+    if (html.includes(ref)) {
+      failures.push(`user-action load: index.html references ${ref}; chunks may load only after a user action`);
+    }
+  }
+  const siteJs = await readFile(join(root, 'assets', 'js', 'site.js'), 'utf8');
+  let refLines = 0;
+  siteJs.split(/\r?\n/).forEach((line, i) => {
+    if (!LAZY_REFS.some((ref) => line.includes(ref))) return;
+    refLines++;
+    if (!line.includes(LAZY_MARKER)) {
+      failures.push(`user-action load: assets/js/site.js line ${i + 1} references a lazy chunk without ${LAZY_MARKER}`);
+    }
+  });
+  if (refLines === 0) {
+    failures.push('user-action load: assets/js/site.js has no reference to graph-scene.js or three.module (graph not wired)');
+  }
+} catch (e) {
+  failures.push(`user-action load: cannot read sources (${e.message})`);
 }
 
 // Log entries (6): every content/log/*.md must parse and validate against the schema.

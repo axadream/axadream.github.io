@@ -248,6 +248,10 @@ h1 {
 .lg { display: inline-flex; align-items: center; gap: 6px; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
 .dot.hollow { background: transparent; border: 2px solid var(--c); }
+.lg-play { font: inherit; font-size: .85rem; color: var(--text); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.lg-play:hover { border-color: var(--accent); }
+.lg-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lg-play[aria-pressed="true"] { border-color: var(--accent); cursor: default; }
 .lg-upd { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .sitemap { margin-top: var(--s1); font-size: .74rem; line-height: 1.35; }
 .sitemap ul { display: grid; gap: 0; }

@@ -125,19 +125,22 @@ if (!reduced) {
 		const up = document.getElementById('graph-updated');
 		if (up) up.textContent = 'Last update: ' + (d === 0 ? 'today' : d === 1 ? '1 day ago' : d + ' days ago');
 	} catch (e) { return; }
-	if (navigator.connection?.saveData) return;
 	const list = document.querySelector('nav[aria-label="Site map"]');
 	let scene = null;
-	let started = false;
 	let cv = canvas;
 
+	let wired = null;
 	const start = async () => {
 		try {
-			const mod = await import('./graph-scene.js');
-			cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); scene && scene.pause(); });
-			cv.addEventListener('webglcontextrestored', rebuild);
+			const mod = await import('./graph-scene.js'); /* user-action-load */
+			if (wired !== cv) {
+				wired = cv;
+				cv.addEventListener('webglcontextlost', (e) => { e.preventDefault(); scene && scene.pause(); });
+				cv.addEventListener('webglcontextrestored', rebuild);
+			}
 			scene = await mod.startScene(cv, { layout: L, box, list, reducedMotion: reduced && !force, debug: dbg });
-		} catch (e) { }
+			return !!scene;
+		} catch (e) { return false; }
 	};
 	// A canvas whose context was force-lost cannot get a new one, so rebuild on a fresh canvas.
 	const rebuild = () => {
@@ -162,18 +165,16 @@ if (!reduced) {
 		if (!g || g.isContextLost()) rebuild(); else scene.resume();
 	});
 
-	const arm = () => {
-		if (!('IntersectionObserver' in window)) return;
-		const io = new IntersectionObserver((entries) => {
-			if (started || !entries.some((e) => e.isIntersecting)) return;
-			started = true;
-			io.disconnect();
-			if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
-			else setTimeout(start, 200);
-		});
-		io.observe(box);
-	};
-
-	if (document.readyState === 'complete') arm();
-	else window.addEventListener('load', arm, { once: true });
+	const play = document.getElementById('graph-play');
+	if (!play) return;
+	play.addEventListener('click', async () => {
+		if (play.disabled) return;
+		play.setAttribute('aria-pressed', 'true');
+		play.disabled = true;
+		const ok = await start();
+		if (!ok) {
+			play.disabled = false;
+			play.setAttribute('aria-pressed', 'false');
+		}
+	});
 })();
