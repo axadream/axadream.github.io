@@ -220,7 +220,7 @@ test('build: a front matter parse failure throws and names the file', () => {
 
 test('about page, home JSON-LD and content/about.md share one jobTitle', () => {
   const title = /^jobTitle: "(.+)"$/m.exec(readFileSync(join(repo, 'content', 'about.md'), 'utf8'))[1];
-  assert.equal(title, 'IT and MES consultant');
+  assert.equal(title, 'Industrial IT and MES consultant');
   const ld = `"jobTitle":"${title}"`;
   assert.ok(readFileSync(join(repo, 'about', 'index.html'), 'utf8').includes(ld));
   assert.ok(readFileSync(join(repo, 'index.html'), 'utf8').includes(ld));

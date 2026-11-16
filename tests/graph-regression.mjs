@@ -201,6 +201,50 @@ try {
 		report('D reduced motion: no drift, drag works and stays', up && still < 0.05 && moved > 40 && kept < 0.5 && en < 0.05, `still=${still.toFixed?.(2)} moved=${moved.toFixed?.(1)} kept=${kept.toFixed?.(2)} energy=${en}`);
 		await ctx.close();
 	}
+
+	// (F) Play -> Running state; Reload rebuilds the scene (positions change) without a second three.module request
+	{
+		const { ctx, page, urls } = await openPage();
+		await page.locator('#graph-play').click();
+		const up = await ready(page);
+		await sleep(500);
+		const state = await page.evaluate(() => ({ text: document.getElementById('graph-play').textContent.trim(), pressed: document.getElementById('graph-play').getAttribute('aria-pressed'), reloadVisible: !document.getElementById('graph-reload').hidden }));
+		report('F Play shows Running, pressed, Reload visible', up && state.text === 'Running' && state.pressed === 'true' && state.reloadVisible, JSON.stringify(state));
+		const p0 = up ? await pos(page) : {};
+		await page.locator('#graph-reload').click();
+		await sleep(300);
+		const up2 = await ready(page);
+		await sleep(500);
+		const p1 = up2 ? await pos(page) : {};
+		const changed = Object.keys(p0).filter((k) => p1[k] && dist(p0[k], p1[k]) > 0.05).length;
+		report('F Reload rebuilds: at least one node position changed', up2 && changed >= 1, `graph=${up2} changed=${changed}`);
+		const three = threeHits(urls);
+		report('F exactly one three.module request after Reload', three === 1, `three=${three}`);
+		await ctx.close();
+	}
+	// (G) reduced-motion note after Play (1280x800); with motion allowed the label stays empty and the graph drifts
+	{
+		const MSG = 'Motion reduced by your system setting; drag still works';
+		const label = (page) => page.evaluate(() => (document.getElementById('graph-label')?.textContent || '').trim());
+		const vp = { width: 1280, height: 800 };
+		const r = await openPage({ reducedMotion: 'reduce', viewport: vp }, 'reduce');
+		const upR = await play(r.page);
+		await sleep(300);
+		const textR = upR ? await label(r.page) : '<no graph>';
+		report('G reduced motion: label shows the note after Play', upR && textR === MSG, `label=${JSON.stringify(textR)}`);
+		await r.ctx.close();
+
+		const o = await openPage({ reducedMotion: 'no-preference', viewport: vp }, 'force');
+		const upO = await play(o.page);
+		await sleep(300);
+		const textO = upO ? await label(o.page) : '<no graph>';
+		const q0 = upO ? await pos(o.page) : {};
+		await sleep(3000);
+		const q1 = upO ? await pos(o.page) : {};
+		const disp = Math.max(0, ...Object.keys(q0).map((k) => (q1[k] ? dist(q0[k], q1[k]) : 0)));
+		report('G motion allowed: label empty and nodes drift >2px in 3 s', upO && textO === '' && disp > 2, `label=${JSON.stringify(textO)} disp=${disp.toFixed(1)}px`);
+		await o.ctx.close();
+	}
 } finally {
 	await browser.close();
 	server.close();

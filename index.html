@@ -27,7 +27,7 @@
 <link rel="preload" href="/vendor/space-grotesk/SpaceGrotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/site.css">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Alex Pintea","url":"https://alepax.com/","sameAs":["https://github.com/axadream","https://www.linkedin.com/in/alex-pintea"],"jobTitle":"IT and MES consultant"}
+{"@context":"https://schema.org","@type":"Person","name":"Alex Pintea","url":"https://alepax.com/","sameAs":["https://github.com/axadream","https://www.linkedin.com/in/alex-pintea"],"jobTitle":"Industrial IT and MES consultant"}
 </script>
 </head>
 <body>
@@ -67,6 +67,63 @@
           <li>Learning math by coding</li>
           <li>Practising Blender and Three.js</li>
         </ul>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="graph-wrap">
+      <div class="play-row">
+        <button type="button" class="lg-play play-cue" id="graph-play" aria-pressed="false">Play the graph</button>
+        <button type="button" class="lg-play lg-reload" id="graph-reload" hidden>Reload</button>
+        <span class="play-cap">Interactive site map, Three.js, loads on click</span>
+      </div>
+      <div class="card hero-box" id="hero-box" role="group" aria-label="Site graph: projects and log entries">
+        <svg class="hero-poster" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
+          <g class="poster-edges" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity=".6">
+            <path d="M100 28 L150 56 L158 112 L100 172 L42 112 L50 56 Z"/>
+            <path d="M100 28 L100 172"/>
+            <path d="M50 56 L158 112"/>
+            <path d="M150 56 L42 112"/>
+            <path d="M100 28 L158 112 M100 28 L42 112 M100 172 L150 56 M100 172 L50 56"/>
+            <path d="M78 84 L124 84 L132 128 L68 128 Z" opacity=".7"/>
+            <path d="M78 84 L100 28 M124 84 L100 28 M132 128 L100 172 M68 128 L100 172 M78 84 L50 56 M124 84 L150 56 M132 128 L158 112 M68 128 L42 112"/>
+          </g>
+          <g class="poster-dots" fill="currentColor">
+            <circle cx="100" cy="28" r="3.2"/><circle cx="150" cy="56" r="3.2"/><circle cx="158" cy="112" r="3.2"/>
+            <circle cx="100" cy="172" r="3.2"/><circle cx="42" cy="112" r="3.2"/><circle cx="50" cy="56" r="3.2"/>
+            <circle cx="78" cy="84" r="2.6"/><circle cx="124" cy="84" r="2.6"/><circle cx="132" cy="128" r="2.6"/><circle cx="68" cy="128" r="2.6"/>
+            <circle cx="22" cy="40" r="1.8" opacity=".6"/><circle cx="182" cy="150" r="1.8" opacity=".6"/><circle cx="176" cy="30" r="1.8" opacity=".6"/><circle cx="24" cy="164" r="1.8" opacity=".6"/>
+          </g>
+        </svg>
+        <canvas id="hero-canvas" aria-hidden="true" data-scene="graph"></canvas>
+        <div id="graph-label" class="graph-label" aria-live="polite"></div>
+      </div>
+      <div class="legend">
+        <span class="lg"><i class="dot t-new"></i>New</span>
+        <span class="lg"><i class="dot t-recent"></i>Recent</span>
+        <span class="lg"><i class="dot t-older"></i>Older</span>
+        <span class="lg"><i class="dot hollow t-planned"></i>Planned</span>
+        <span class="lg-upd" id="graph-updated">Last update: see the log</span>
+      </div>
+      <nav class="sitemap" aria-label="Site map">
+        <ul>
+<!-- sitemap:start -->
+          <li><a href="/OpenHorizon/" data-node="openhorizon">OpenHorizon</a></li>
+          <li><a href="#projects" data-node="next-ai-project">Next AI project: RAG or agent, with evals</a></li>
+          <li><a href="/log/#e-20261116T080200Z" data-node="log-20261116T080200Z">Ep 14 · 2026-11-16 · improved the log entry with more displayed details. Done</a></li>
+          <li><a href="/log/#e-20261115T212000Z" data-node="log-20261115T212000Z">Ep 13 · 2026-11-15 · added some fixes and improvements to alepax.com. This is do…</a></li>
+          <li><a href="/log/#e-20261114T213100Z" data-node="log-20261114T213100Z">Ep 12 · 2026-11-14 · some fixes related to the log admin from alepax.com</a></li>
+          <li><a href="/log/#e-20261114T135300Z" data-node="log-20261114T135300Z">Ep 11 · 2026-11-14 · working on alepax.com</a></li>
+          <li><a href="/log/#e-20261114T134028Z" data-node="log-20261114T134028Z">Ep 10 · 2026-11-14 · Log pipeline is live. Three gated branches merged through p…</a></li>
+          <li><a href="/log/#e-20261109T190000Z" data-node="log-20261109T190000Z">Ep 9 · 2026-11-09 · 69 minutes on the AI path.</a></li>
+          <li><a href="/log/#e-20261107T190000Z" data-node="log-20261107T190000Z">Ep 8 · 2026-11-07 · Over 1 hour on the AI path.</a></li>
+          <li><a href="/log/#e-20261106T190000Z" data-node="log-20261106T190000Z">Ep 7 · 2026-11-06 · Over 50 minutes on the AI path.</a></li>
+          <li><a href="/log/#e-20261105T190000Z" data-node="log-20261105T190000Z">Ep 6 · 2026-11-05 · 50 minutes of coding and explanations for the AI path.</a></li>
+          <li><a href="/log/#e-20261104T190000Z" data-node="log-20261104T190000Z">Ep 5 · 2026-11-04 · Several minutes of coding and explanations for the AI path.</a></li>
+          <li><a href="/log/#e-20261103T190000Z" data-node="log-20261103T190000Z">Ep 4 · 2026-11-03 · Almost 1 hour writing code requested by my AI Engineering g…</a></li>
+          <li><a href="/log/#e-20261102T190000Z" data-node="log-20261102T190000Z">Ep 3 · 2026-11-02 · Completed a function requested by the AI path plan. Floor d…</a></li>
+<!-- sitemap:end -->
+        </ul>
+      </nav>
       </div>
     </div>
   </section>
@@ -133,65 +190,6 @@
       <p class="log-more"><a href="/log/">All entries &rarr; /log/</a></p>
     </div>
   </section>
-
-  <section id="graph" class="section wrap graph-section" aria-label="Site graph">
-    <div class="hero-visual">
-      <div class="graph-wrap">
-      <div class="play-row">
-        <button type="button" class="lg-play play-cue" id="graph-play" aria-pressed="false">Play the graph</button>
-        <span class="play-cap">Interactive site map, Three.js, loads on click</span>
-      </div>
-      <div class="card hero-box" id="hero-box" role="group" aria-label="Site graph: projects and log entries">
-        <svg class="hero-poster" viewBox="0 0 200 200" aria-hidden="true" focusable="false">
-          <g class="poster-edges" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity=".6">
-            <path d="M100 28 L150 56 L158 112 L100 172 L42 112 L50 56 Z"/>
-            <path d="M100 28 L100 172"/>
-            <path d="M50 56 L158 112"/>
-            <path d="M150 56 L42 112"/>
-            <path d="M100 28 L158 112 M100 28 L42 112 M100 172 L150 56 M100 172 L50 56"/>
-            <path d="M78 84 L124 84 L132 128 L68 128 Z" opacity=".7"/>
-            <path d="M78 84 L100 28 M124 84 L100 28 M132 128 L100 172 M68 128 L100 172 M78 84 L50 56 M124 84 L150 56 M132 128 L158 112 M68 128 L42 112"/>
-          </g>
-          <g class="poster-dots" fill="currentColor">
-            <circle cx="100" cy="28" r="3.2"/><circle cx="150" cy="56" r="3.2"/><circle cx="158" cy="112" r="3.2"/>
-            <circle cx="100" cy="172" r="3.2"/><circle cx="42" cy="112" r="3.2"/><circle cx="50" cy="56" r="3.2"/>
-            <circle cx="78" cy="84" r="2.6"/><circle cx="124" cy="84" r="2.6"/><circle cx="132" cy="128" r="2.6"/><circle cx="68" cy="128" r="2.6"/>
-            <circle cx="22" cy="40" r="1.8" opacity=".6"/><circle cx="182" cy="150" r="1.8" opacity=".6"/><circle cx="176" cy="30" r="1.8" opacity=".6"/><circle cx="24" cy="164" r="1.8" opacity=".6"/>
-          </g>
-        </svg>
-        <canvas id="hero-canvas" aria-hidden="true" data-scene="graph"></canvas>
-        <div id="graph-label" class="graph-label" aria-live="polite"></div>
-      </div>
-      <div class="legend">
-        <span class="lg"><i class="dot t-new"></i>New</span>
-        <span class="lg"><i class="dot t-recent"></i>Recent</span>
-        <span class="lg"><i class="dot t-older"></i>Older</span>
-        <span class="lg"><i class="dot hollow t-planned"></i>Planned</span>
-        <span class="lg-upd" id="graph-updated">Last update: see the log</span>
-      </div>
-      <nav class="sitemap" aria-label="Site map">
-        <ul>
-<!-- sitemap:start -->
-          <li><a href="/OpenHorizon/" data-node="openhorizon">OpenHorizon</a></li>
-          <li><a href="#projects" data-node="next-ai-project">Next AI project: RAG or agent, with evals</a></li>
-          <li><a href="/log/#e-20261116T080200Z" data-node="log-20261116T080200Z">Ep 14 · 2026-11-16 · improved the log entry with more displayed details. Done</a></li>
-          <li><a href="/log/#e-20261115T212000Z" data-node="log-20261115T212000Z">Ep 13 · 2026-11-15 · added some fixes and improvements to alepax.com. This is do…</a></li>
-          <li><a href="/log/#e-20261114T213100Z" data-node="log-20261114T213100Z">Ep 12 · 2026-11-14 · some fixes related to the log admin from alepax.com</a></li>
-          <li><a href="/log/#e-20261114T135300Z" data-node="log-20261114T135300Z">Ep 11 · 2026-11-14 · working on alepax.com</a></li>
-          <li><a href="/log/#e-20261114T134028Z" data-node="log-20261114T134028Z">Ep 10 · 2026-11-14 · Log pipeline is live. Three gated branches merged through p…</a></li>
-          <li><a href="/log/#e-20261109T190000Z" data-node="log-20261109T190000Z">Ep 9 · 2026-11-09 · 69 minutes on the AI path.</a></li>
-          <li><a href="/log/#e-20261107T190000Z" data-node="log-20261107T190000Z">Ep 8 · 2026-11-07 · Over 1 hour on the AI path.</a></li>
-          <li><a href="/log/#e-20261106T190000Z" data-node="log-20261106T190000Z">Ep 7 · 2026-11-06 · Over 50 minutes on the AI path.</a></li>
-          <li><a href="/log/#e-20261105T190000Z" data-node="log-20261105T190000Z">Ep 6 · 2026-11-05 · 50 minutes of coding and explanations for the AI path.</a></li>
-          <li><a href="/log/#e-20261104T190000Z" data-node="log-20261104T190000Z">Ep 5 · 2026-11-04 · Several minutes of coding and explanations for the AI path.</a></li>
-          <li><a href="/log/#e-20261103T190000Z" data-node="log-20261103T190000Z">Ep 4 · 2026-11-03 · Almost 1 hour writing code requested by my AI Engineering g…</a></li>
-          <li><a href="/log/#e-20261102T190000Z" data-node="log-20261102T190000Z">Ep 3 · 2026-11-02 · Completed a function requested by the AI path plan. Floor d…</a></li>
-<!-- sitemap:end -->
-        </ul>
-      </nav>
-      </div>
-    </div>
-  </section>
 </main>
 
 <footer class="site-footer">
@@ -202,7 +200,7 @@
       <li><a href="#" data-email>Email</a></li>
     </ul>
     <p class="copy">© Alex Pintea, all rights reserved</p>
-    <p class="foot-ver"><a href="https://github.com/axadream/axadream.github.io/blob/main/CHANGELOG.md" rel="noopener">v1.5.0</a> · <time datetime="2026-11-16">2026-11-16</time></p>
+    <p class="foot-ver"><a href="https://github.com/axadream/axadream.github.io/blob/main/CHANGELOG.md" rel="noopener">v1.6.1</a> · <time datetime="2026-11-16">2026-11-16</time></p>
   </div>
 </footer>
 

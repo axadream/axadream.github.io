@@ -151,7 +151,7 @@ if (!reduced) {
 		cv.replaceWith(n);
 		cv = n;
 		box.classList.remove('scene-on');
-		start();
+		return start();
 	};
 
 	window.addEventListener('pagehide', (e) => {
@@ -168,17 +168,25 @@ if (!reduced) {
 	const play = document.getElementById('graph-play');
 	if (!play) return;
 	const idle = play.textContent;
+	const rl = document.getElementById('graph-reload');
+	const lab = document.getElementById('graph-label');
+	const ui = (on) => {
+		play.setAttribute('aria-pressed', on);
+		play.textContent = on ? 'Running' : idle;
+		play.classList.toggle('play-cue', !on);
+		if (rl) rl.hidden = !on;
+	};
+	const fail = () => { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; };
+	const note = () => { if (lab) lab.textContent = reduced && !force ? 'Motion reduced by your system setting; drag still works' : ''; };
 	play.addEventListener('click', async () => {
-		if (play.disabled) return;
-		play.setAttribute('aria-pressed', 'true');
+		if (play.disabled || play.getAttribute('aria-pressed') === 'true') return;
 		play.disabled = true;
-		play.textContent = 'Graph running';
-		play.classList.remove('play-cue');
+		ui(true);
 		const ok = await start();
-		if (!ok) {
-			play.disabled = false;
-			play.setAttribute('aria-pressed', 'false');
-			play.textContent = idle;
-		}
+		play.disabled = false;
+		if (!ok) fail(); else note();
+	});
+	if (rl) rl.addEventListener('click', async () => {
+		if (!(await rebuild())) fail(); else note();
 	});
 })();

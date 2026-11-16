@@ -10,11 +10,18 @@ python -m http.server 8080
 
 Then open http://localhost:8080/
 
+## Hero graph buttons
+
+- "Play the graph" loads the 3D scene on first click and turns into "Running" (pressed).
+- "Reload" appears while running and rebuilds the scene on a fresh canvas. If the
+  rebuild fails, the button returns to "Play the graph" and the label shows an error.
+
 ## Debugging motion
 
 - Add `?motion=force` on localhost or 127.0.0.1 to run the hero graph even when
   prefers-reduced-motion is set. Ignored on any other host. `?motion=reduce` on the
   same hosts forces the reduced-motion path for testing.
+- With reduced motion the graph stays still after Play and `#graph-label` says so; drag still works.
 - The same override exposes `window.__graph` with `positions()`, `energy()` and `fps()`.
   It is removed when the scene is disposed.
 - Ambient float amplitude, period range and depth wobble are the `AMBIENT_*` constants
