@@ -190,7 +190,7 @@ browser console for CSP blocks.
 
 ## Versioning
 
-- The version lives in `site.config.json` (`version`), mirrored in the footer `.foot-ver` line of `index.html` and in `CHANGELOG.md`.
+- The version lives in `site.config.json` (`version`), mirrored in the footer `.foot-ver` line of `index.html` and in `CHANGELOG.md`. The footer reads "© <year> Alex Pintea · v<version>"; `build-log` computes the year from the newest log entry timestamp, so it never needs hand-editing.
 - `scripts/check-no-business.mjs` fails if the three disagree, or if `threeDWork` or `lab` is not `false`.
 - Release: bump all three, run the guard, commit, then tag `v<version>`.
 
