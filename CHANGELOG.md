@@ -9,9 +9,12 @@ All notable changes to this site are documented here. The format follows
 ### Added
 
 - Atom feed at `/feed.xml` of non-draft log entries, newest first, with `alternate` head links on `/` and `/log/`.
+- Drift test: one fixture is rejected by both the guard and `tools/log-post/post.mjs`, so the proof rule cannot diverge between schema, guard and poster.
+- `/AI_Engineering_Handbook/` in `sitemap.xml`.
 
 ### Changed
 
+- Five AI-guided posts gained a `proof` link to the pull request that shipped the work (three also got a clearer one-sentence text).
 - Guard: posts with `made` = AI-guided or Mixed fail the build without a `proof` URL. Manual stays optional.
 - CMS hint on the Proof field states the same rule (the field stays `required: false`).
 

@@ -11,35 +11,35 @@
     <title>Ep 14 · App · AI-guided</title>
     <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-20261116T080200Z"/>
     <updated>2026-11-16T08:02:00Z</updated>
-    <content type="html">&lt;p&gt;improved the log entry with more displayed details&lt;/p&gt;</content>
+    <content type="html">&lt;p&gt;Log entries now link their cards to the AI Engineering Handbook, and alepax.com has a Handbook button plus a home line pointing to the log.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/axadream/axadream.github.io/pull/8&quot;&gt;Proof&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261115T212000Z</id>
     <title>Ep 13 · App · AI-guided</title>
     <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-20261115T212000Z"/>
     <updated>2026-11-15T21:20:00Z</updated>
-    <content type="html">&lt;p&gt;added some fixes and improvements to alepax.com&lt;/p&gt;</content>
+    <content type="html">&lt;p&gt;Shipped log schema v2 on alepax.com: made and track fields, a legend, badges and a Start-here block, with proof links limited to the project&amp;#39;s own sites.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/axadream/axadream.github.io/pull/7&quot;&gt;Proof&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261114T213100Z</id>
     <title>Ep 12 · App · AI-guided</title>
     <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-20261114T213100Z"/>
     <updated>2026-11-14T21:31:00Z</updated>
-    <content type="html">&lt;p&gt;some fixes related to the log admin from alepax.com&lt;/p&gt;</content>
+    <content type="html">&lt;p&gt;some fixes related to the log admin from alepax.com&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/axadream/axadream.github.io/pull/6&quot;&gt;Proof&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261114T135300Z</id>
     <title>Ep 11 · App · AI-guided</title>
     <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-20261114T135300Z"/>
     <updated>2026-11-14T13:53:00Z</updated>
-    <content type="html">&lt;p&gt;working on alepax.com&lt;/p&gt;</content>
+    <content type="html">&lt;p&gt;Added a guard policy to alepax.com that warns on stale generated outputs by default, with a --strict mode that fails them, plus tests for it.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/axadream/axadream.github.io/pull/4&quot;&gt;Proof&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261114T134028Z</id>
     <title>Ep 10 · App · AI-guided</title>
     <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-20261114T134028Z"/>
     <updated>2026-11-14T13:40:28Z</updated>
-    <content type="html">&lt;p&gt;Log pipeline is live. Three gated branches merged through pull requests, Pages switched to GitHub Actions, release tags added. Claude Code ran the steps from my gate prompts; I reviewed every report before the next gate.&lt;/p&gt;</content>
+    <content type="html">&lt;p&gt;Log pipeline is live. Three gated branches merged through pull requests, Pages switched to GitHub Actions, release tags added. Claude Code ran the steps from my gate prompts; I reviewed every report before the next gate.&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://github.com/axadream/axadream.github.io/pull/3&quot;&gt;Proof&lt;/a&gt;&lt;/p&gt;</content>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261109T190000Z</id>

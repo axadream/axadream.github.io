@@ -221,3 +221,10 @@ test('build: a front matter parse failure throws and names the file', () => {
 test('log-post schema copy is identical', () => {
   assert.equal(readFileSync(join(repo, 'schema', 'log-entry.schema.json'), 'utf8'), readFileSync(join(repo, 'tools', 'log-post', 'log-entry.schema.json'), 'utf8'));
 });
+
+test('sitemap.xml lists the AI Engineering Handbook without lastmod', () => {
+  const xml = readFileSync(join(repo, 'sitemap.xml'), 'utf8');
+  const m = /<url>\s*<loc>https:\/\/alepax\.com\/AI_Engineering_Handbook\/<\/loc>\s*<\/url>/.exec(xml);
+  assert.ok(m, 'Handbook <url> entry missing');
+  assert.ok(!m[0].includes('lastmod'));
+});
