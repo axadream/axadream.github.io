@@ -168,17 +168,21 @@ if (!reduced) {
 	const play = document.getElementById('graph-play');
 	if (!play) return;
 	const idle = play.textContent;
+	const rl = document.getElementById('graph-reload');
+	const lab = document.getElementById('graph-label');
+	const ui = (on) => {
+		play.setAttribute('aria-pressed', on);
+		play.textContent = on ? 'Running' : idle;
+		play.classList.toggle('play-cue', !on);
+		if (rl) rl.hidden = !on;
+	};
 	play.addEventListener('click', async () => {
-		if (play.disabled) return;
-		play.setAttribute('aria-pressed', 'true');
+		if (play.disabled || play.getAttribute('aria-pressed') === 'true') return;
 		play.disabled = true;
-		play.textContent = 'Graph running';
-		play.classList.remove('play-cue');
+		ui(true);
 		const ok = await start();
-		if (!ok) {
-			play.disabled = false;
-			play.setAttribute('aria-pressed', 'false');
-			play.textContent = idle;
-		}
+		play.disabled = false;
+		if (!ok) { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; }
 	});
+	if (rl) rl.addEventListener('click', rebuild);
 })();

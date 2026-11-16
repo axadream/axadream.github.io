@@ -1,4 +1,4 @@
-﻿@font-face {
+@font-face {
   font-family: "Space Grotesk";
   src: url("/vendor/space-grotesk/SpaceGrotesk-latin.woff2") format("woff2");
   font-weight: 300 700;
@@ -189,7 +189,6 @@ h1 {
 .btn-secondary:hover { border-color: var(--accent); }
 .hero .tagline { max-width: 38em; }
 .start-row { padding-block: 0; }
-.graph-section .hero-visual { padding-block: var(--s4); }
 .now-card { margin-top: 36px; padding: 20px var(--s3); max-width: 460px; }
 .now-title {
   display: flex; align-items: center; gap: 10px;
@@ -254,13 +253,14 @@ h1 {
 .lg-play { font: inherit; font-size: .85rem; color: var(--text); background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
 .lg-play:hover { border-color: var(--accent); }
 .lg-play:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.lg-play[aria-pressed="true"] { border-color: var(--accent); cursor: default; }
+.lg-play[aria-pressed="true"] { cursor: default; }
 .play-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--s2); margin-bottom: 12px; }
 .play-cap { font-size: .85rem; color: var(--muted); }
-.lg-play.play-cue { border: 2px solid var(--accent); outline: 2px solid transparent; animation: play-glow 2s ease-out 1; animation-iteration-count: 1; }
-.lg-play.play-cue:hover { background: var(--glow); box-shadow: 0 0 0 3px var(--glow); }
-.lg-play.play-cue:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; box-shadow: 0 0 0 5px var(--glow); }
-@keyframes play-glow { 0% { box-shadow: 0 0 0 0 var(--accent); } 40% { box-shadow: 0 0 14px 6px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
+.lg-play.play-cue { background: var(--accent); color: var(--on-accent); border: 2px solid var(--accent); font-weight: 600; animation: play-pulse 1.5s ease-in-out infinite; }
+.lg-play.play-cue:hover { filter: brightness(1.08); }
+.lg-play[aria-pressed="true"] { background: transparent; color: var(--text); border: 2px solid var(--accent); }
+.lg-reload[hidden] { display: none; }
+@keyframes play-pulse { 0%, 100% { opacity: 1; box-shadow: 0 0 0 0 var(--glow); } 50% { opacity: .72; box-shadow: 0 0 0 8px var(--glow); } }
 @media (prefers-reduced-motion: reduce) { .lg-play.play-cue { animation: none; } }
 
 /* about page */
