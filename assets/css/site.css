@@ -264,12 +264,35 @@ h1 {
 @media (prefers-reduced-motion: reduce) { .lg-play.play-cue { animation: none; } }
 
 /* about page */
-.about-card { max-width: 65ch; }
-.about-card p { margin: 0 0 var(--s2); line-height: 1.6; }
-.about-card p:last-child { margin-bottom: 0; }
-.about-card a { color: var(--accent); text-underline-offset: 2px; }
-.about-card a:hover, .about-card a:focus-visible { text-decoration-thickness: 2px; }
-.about-links { display: flex; flex-wrap: wrap; gap: 6px var(--s2); color: var(--muted); }
+.about-hero {
+  background-color: var(--bg);
+  background-image: linear-gradient(135deg, var(--surface) 0%, var(--bg) 55%, var(--glow) 100%);
+  border-bottom: 1px solid var(--card-border);
+  padding-block: clamp(var(--s6), 8vw, 96px) clamp(var(--s5), 6vw, var(--s8));
+}
+.about-name { font-size: clamp(3rem, 1.8rem + 6vw, 5.5rem); line-height: 1.02; letter-spacing: -.035em; }
+.about-title { margin-top: var(--s2); font-size: clamp(1.1rem, 1rem + .6vw, 1.4rem); line-height: 1.35; color: var(--accent); font-weight: 600; }
+:root[data-theme="light"] .about-title { color: var(--accent-2); }
+.about-loc { margin-top: var(--s1); color: var(--muted); }
+.about-body { padding-block: var(--s6) var(--s8); }
+.about-grid { display: grid; gap: var(--s4); align-items: start; }
+@media (min-width: 900px) { .about-grid { grid-template-columns: minmax(0, 65ch) minmax(240px, 1fr); gap: var(--s7); } }
+.about-text p { margin: 0 0 var(--s2); line-height: 1.6; max-width: 65ch; }
+.about-facts { padding: var(--s3); }
+.about-facts h2 { font-size: .85rem; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: var(--s1); }
+.about-facts p { margin-bottom: var(--s3); line-height: 1.5; }
+.about-tracks li { display: flex; align-items: center; gap: 10px; padding: 4px 0; }
+.about-tracks .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.about-h { font-size: 1.5rem; margin: var(--s7) 0 var(--s3); }
+.about-tiles { display: grid; gap: var(--s2); grid-template-columns: 1fr; }
+@media (min-width: 720px) { .about-tiles { grid-template-columns: repeat(3, 1fr); } }
+.about-tile { display: flex; flex-direction: column; gap: var(--s1); padding: var(--s3); color: var(--text); text-decoration: none; transition: transform .2s ease, border-color .2s ease; }
+.about-tile h3 { font-size: 1.15rem; }
+.about-tile p { color: var(--muted); line-height: 1.5; flex: 1; }
+.about-arrow { color: var(--accent); font-weight: 700; }
+.about-tile:hover, .about-tile:focus-visible { transform: translateY(-4px); border-color: var(--accent); }
+.about-connect { margin-top: 0; }
+@media (prefers-reduced-motion: reduce) { .about-tile { transition: none; } .about-tile:hover, .about-tile:focus-visible { transform: none; } }
 .lg-upd { margin-left: auto; font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .sitemap { margin-top: var(--s1); font-size: .74rem; line-height: 1.35; }
 .sitemap ul { display: grid; gap: 0; }

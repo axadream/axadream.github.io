@@ -1,10 +1,12 @@
 ---
-jobTitle: "IT and MES consultant"
+jobTitle: "Industrial IT and MES consultant"
 ---
-I am Alex Pintea, based in Transylvania, Romania. For more than twenty years I have worked in industrial IT, most of it as an MES consultant in automotive manufacturing. My daily work is writing technical requirement specifications: turning what production needs into precise, testable requirements that external developers implement in a production-tracking system, then checking the result against the specification.
+Industrial IT & MES Consultant · Building in applied AI and 3D
 
-Outside that work I learn by building, in public and in small daily steps: applied AI engineering (retrieval-augmented generation, agent workflows, API integration, small self-hosted models), mathematics learned through code, and 3D animation with Blender and Three.js. Since November 2026 I follow a structured AI path and I am at level 1 of 6; every step is logged, each log entry states who wrote the code, and the study notes are published as an open handbook.
+Based in Transylvania, Romania
 
-My education is a master's in applied informatics and a bachelor's in environmental engineering.
+With over 20 years in automotive industrial IT, I bridge the gap between factory-floor operations and software engineering. My core work is translating manufacturing needs into precise, testable technical specifications for production-tracking systems, and validating the delivered software against production reality.
 
-On this site: the OpenHorizon app (a shipped, installable PWA), the practice log with proof links, and the AI Engineering Handbook.
+Beyond enterprise MES, I build in public at the intersection of applied AI engineering (RAG pipelines, agentic workflows, API integrations and self-hosted local models), mathematics learned through code, and 3D graphics with Blender and Three.js. I document the builds, the experiments and the study notes openly, as living proof of execution.
+
+M.Sc. in Applied Informatics · B.Sc. in Environmental Engineering

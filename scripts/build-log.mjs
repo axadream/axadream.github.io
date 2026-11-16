@@ -304,15 +304,47 @@ export function parseAbout(text) {
 
 function aboutHtml(index, about) {
   const { head, footer } = chrome(index, { aboutCurrent: true });
-  const first = (about.paras[1] || about.paras[0]).split(/(?<=\.)\s/)[0];
+  if (about.paras.length < 5) throw new Error('content/about.md: expected title, location, 2 paragraphs, education');
+  const [titleLine, location, p1, p2, edu] = about.paras;
+  const first = p1.split(/(?<=\.)\s/)[0];
   const ld = (o) => `<script type="application/ld+json">\n${JSON.stringify(o).replace(/</g, '\\u003c')}\n</script>\n`;
   const person = { '@context': 'https://schema.org', '@type': 'Person', ...PERSON, jobTitle: about.jobTitle };
   const page = { '@context': 'https://schema.org', '@type': 'ProfilePage', url: 'https://alepax.com/about/', mainEntity: { '@type': 'Person', name: PERSON.name, url: PERSON.url } };
-  const paras = about.paras.map((p) => `    <p>${esc(p)}</p>\n`).join('');
-  return head('About — Alex Pintea', esc(first), 'https://alepax.com/about/', ld(person) + ld(page)) + `<main id="main" class="wrap">
-  <h1 class="section-title">About</h1>
-  <div class="card about-card">
-${paras}    <p class="about-links">Links: <a href="https://github.com/axadream" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/alex-pintea" rel="noopener">LinkedIn</a> · <a href="#" data-email>Email</a></p>
+  const tile = (href, title, text) => `      <a class="card about-tile" href="${href}"><h3>${title}</h3><p>${text}</p><span class="about-arrow" aria-hidden="true">→</span></a>\n`;
+  return head('About — Alex Pintea', esc(first), 'https://alepax.com/about/', ld(person) + ld(page)) + `<main id="main">
+  <section class="about-hero" aria-labelledby="about-name">
+    <div class="wrap">
+      <h1 id="about-name" class="about-name">Alex Pintea</h1>
+      <p class="about-title">${esc(titleLine)}</p>
+      <p class="about-loc">${esc(location)}</p>
+    </div>
+  </section>
+  <div class="wrap about-body">
+    <div class="about-grid">
+      <div class="about-text">
+        <p>${esc(p1)}</p>
+        <p>${esc(p2)}</p>
+      </div>
+      <aside class="card about-facts" aria-label="Facts">
+        <h2>Education</h2>
+        <p>${esc(edu)}</p>
+        <h2>Tracks</h2>
+        <ul class="about-tracks">
+          <li><span class="dot" style="background:var(--track-ai-study)" aria-hidden="true"></span>AI</li>
+          <li><span class="dot" style="background:var(--track-math)" aria-hidden="true"></span>Math</li>
+          <li><span class="dot" style="background:var(--track-3d)" aria-hidden="true"></span>3D</li>
+        </ul>
+      </aside>
+    </div>
+    <h2 class="about-h">Explore on this site</h2>
+    <div class="about-tiles">
+${tile('/OpenHorizon/', 'OpenHorizon', 'A shipped, installable PWA RSS reader.')}${tile('/log/', 'Engineering Log', 'Daily builds, experiments and code attribution.')}${tile('/AI_Engineering_Handbook/', 'AI Engineering Handbook', 'Open study notes, CC BY 4.0.')}    </div>
+    <h2 class="about-h">Connect</h2>
+    <div class="links about-connect">
+      <a class="btn btn-secondary" href="https://github.com/axadream" rel="noopener">GitHub</a>
+      <a class="btn btn-secondary" href="https://www.linkedin.com/in/alex-pintea" rel="noopener">LinkedIn</a>
+      <a class="btn btn-secondary" href="#" data-email>Email</a>
+    </div>
   </div>
 </main>
 
