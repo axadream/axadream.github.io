@@ -4,6 +4,12 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2026-11-16
+
+### Fixed
+
+- Graph drift appeared to be missing on desktops with Windows animation effects off; the graph now explains that motion is reduced by the system setting (drag still works)
+
 ## [1.6.0] - 2026-11-16
 
 ### Changed
