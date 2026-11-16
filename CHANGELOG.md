@@ -4,6 +4,18 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-11-16
+
+### Added
+
+- /about/ page built from content/about.md
+
+### Changed
+
+- Proof-first home order
+- 3 home log entries
+- Play-the-graph button above the poster
+
 ## [1.3.0] - 2026-11-16
 
 ### Changed

@@ -23,14 +23,14 @@ document.documentElement.classList.add('js');
 })();
 
 (function () {
-	const a = document.getElementById('email-link');
-	if (!a) return;
 	const u = ['al', 'ex'].join('');
 	const d = ['ale', 'pax', '.com'].join('');
 	const addr = u + '@' + d;
-	a.href = 'mailto:' + addr;
-	a.textContent = 'Email';
-	a.setAttribute('aria-label', 'Email ' + addr);
+	document.querySelectorAll('[data-email]').forEach((a) => {
+		a.href = 'mailto:' + addr;
+		a.textContent = 'Email';
+		a.setAttribute('aria-label', 'Email ' + addr);
+	});
 })();
 
 (function () {
@@ -167,14 +167,18 @@ if (!reduced) {
 
 	const play = document.getElementById('graph-play');
 	if (!play) return;
+	const idle = play.textContent;
 	play.addEventListener('click', async () => {
 		if (play.disabled) return;
 		play.setAttribute('aria-pressed', 'true');
 		play.disabled = true;
+		play.textContent = 'Graph running';
+		play.classList.remove('play-cue');
 		const ok = await start();
 		if (!ok) {
 			play.disabled = false;
 			play.setAttribute('aria-pressed', 'false');
+			play.textContent = idle;
 		}
 	});
 })();

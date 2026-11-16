@@ -130,6 +130,8 @@ try {
 			const alive = await play(page);
 			let moving = false, gl = false;
 			if (alive) {
+				// The graph lives in its own section below the fold; the scene correctly pauses while off-screen.
+				await page.locator('#hero-box').scrollIntoViewIfNeeded();
 				await sleep(500);
 				const p1 = await pos(page);
 				await sleep(1000);

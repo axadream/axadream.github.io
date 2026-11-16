@@ -5,6 +5,7 @@
 //   node scripts/build-log.mjs --check   render in memory, exit 1 if any output is out of date
 //
 // Inputs : content/log/*.md, schema/log-entry.schema.json, data/projects.json, index.html
+// Also: content/about.md -> about/index.html, an /about/ entry in sitemap.xml, and index.html JSON-LD jobTitle.
 // Outputs: index.html (only between <!-- log:start --> and <!-- log:end -->),
 //          log/index.html (fully generated), data/nodes.json
 // Schema-invalid entries are reported, skipped, and make the run exit 1. A front matter PARSE failure
@@ -15,7 +16,8 @@ import { readFileSync, writeFileSync, readdirSync, mkdirSync, existsSync } from 
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const HOME_COUNT = 12;
+const HOME_COUNT = 3;
+const NODE_COUNT = 12;
 const LABEL_MAX = 60;
 const ROOT_DEFAULT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SCHEMA_PATH = join(ROOT_DEFAULT, 'schema', 'log-entry.schema.json');
@@ -255,22 +257,22 @@ const LEGEND_HTML = `<section class="log-legend" aria-label="Legend">
   </section>
 `;
 
-function archiveHtml(index, entries, base) {
+/** Shared page chrome taken from index.html: head template, header (nav fixed for sub-pages), footer. */
+function chrome(index, { aboutCurrent = false } = {}) {
   const themeScript = (/<script>try\{var t=localStorage\.theme[\s\S]*?<\/script>/.exec(index) || [])[0];
   const header = (/<header class="site-header">[\s\S]*?<\/header>/.exec(index) || [])[0];
   const footer = (/<footer class="site-footer">[\s\S]*?<\/footer>/.exec(index) || [])[0];
   if (!themeScript || !header || !footer) throw new Error('index.html: theme script, header or footer not found');
-  const nav = header.replace('href="#projects"', 'href="/#projects"').replace('href="#log"', 'href="/#log"');
-  const n = entries.length;
-  const rows = [...entries].reverse().map((e) => `      ${rowHtml(e, base)}`).join('\n');
-  return `<!doctype html>
+  let nav = header.replace('href="#projects"', 'href="/#projects"').replace('href="#log"', aboutCurrent ? 'href="/log/"' : 'href="/#log"');
+  if (aboutCurrent) { const navAbout = nav.replace('<a href="/about/">', '<a href="/about/" aria-current="page">'); if (navAbout === nav) throw new Error('index.html header: About link not found'); nav = navAbout; }
+  const head = (title, desc, canonical, extra = '') => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Log · alepax</title>
-<meta name="description" content="Archive of Alex Pintea's daily practice log: ${n} ${n === 1 ? 'entry' : 'entries'}.">
-<link rel="canonical" href="https://alepax.com/log/">
+<title>${title}</title>
+<meta name="description" content="${desc}">
+<link rel="canonical" href="${canonical}">
 <meta name="theme-color" content="#0F1115" id="tc">
 <meta name="color-scheme" content="dark">
 ${themeScript}
@@ -279,13 +281,54 @@ ${themeScript}
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" href="/vendor/space-grotesk/SpaceGrotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css">
-</head>
+${extra}</head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
 ${nav}
 
-<main id="main" class="wrap">
+`;
+  return { head, footer };
+}
+
+const PERSON = { name: 'Alex Pintea', url: 'https://alepax.com/', sameAs: ['https://github.com/axadream', 'https://www.linkedin.com/in/alex-pintea'] };
+
+/** Parse content/about.md into { jobTitle, paras[] }. Throws when jobTitle is missing or empty. */
+export function parseAbout(text) {
+  const o = parseEntryFile(text);
+  if (!o.jobTitle || !String(o.jobTitle).trim()) throw new Error('content/about.md: jobTitle is required');
+  const paras = o.text.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  if (!paras.length) throw new Error('content/about.md: empty body');
+  return { jobTitle: o.jobTitle.trim(), paras };
+}
+
+function aboutHtml(index, about) {
+  const { head, footer } = chrome(index, { aboutCurrent: true });
+  const first = (about.paras[1] || about.paras[0]).split(/(?<=\.)\s/)[0];
+  const ld = (o) => `<script type="application/ld+json">\n${JSON.stringify(o).replace(/</g, '\\u003c')}\n</script>\n`;
+  const person = { '@context': 'https://schema.org', '@type': 'Person', ...PERSON, jobTitle: about.jobTitle };
+  const page = { '@context': 'https://schema.org', '@type': 'ProfilePage', url: 'https://alepax.com/about/', mainEntity: { '@type': 'Person', name: PERSON.name, url: PERSON.url } };
+  const paras = about.paras.map((p) => `    <p>${esc(p)}</p>\n`).join('');
+  return head('About — Alex Pintea', esc(first), 'https://alepax.com/about/', ld(person) + ld(page)) + `<main id="main" class="wrap">
+  <h1 class="section-title">About</h1>
+  <div class="card about-card">
+${paras}    <p class="about-links">Links: <a href="https://github.com/axadream" rel="noopener">GitHub</a> · <a href="https://www.linkedin.com/in/alex-pintea" rel="noopener">LinkedIn</a> · <a href="#" data-email>Email</a></p>
+  </div>
+</main>
+
+${footer}
+
+<script type="module" src="/assets/js/site.js"></script>
+</body>
+</html>
+`;
+}
+
+function archiveHtml(index, entries, base) {
+  const { head, footer } = chrome(index);
+  const n = entries.length;
+  const rows = [...entries].reverse().map((e) => `      ${rowHtml(e, base)}`).join('\n');
+  return head('Log · alepax', `Archive of Alex Pintea's daily practice log: ${n} ${n === 1 ? 'entry' : 'entries'}.`, 'https://alepax.com/log/') + `<main id="main" class="wrap">
   <h1 class="section-title">Practice log</h1>
   ${startHereHtml(base)}  ${LEGEND_HTML}  <div class="card log-card">
     <p class="log-intro">Daily practice log. ${n} ${n === 1 ? 'entry' : 'entries'}.</p>
@@ -328,38 +371,58 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   valid.sort((a, b) => Date.parse(a.ts) - Date.parse(b.ts));
   valid.forEach((e, i) => Object.assign(e, { n: i + 1, cts: compactTs(e.ts) }, localParts(e.ts)));
 
-  const newest = [...valid].reverse().slice(0, HOME_COUNT);
+  const newest = [...valid].reverse().slice(0, NODE_COUNT);
   const index = readFileSync(join(root, 'index.html'), 'utf8').replace(/\r\n/g, '\n');
   const [s, e] = between(index, '<!-- log:start -->\n', '<!-- log:end -->');
   const cfgPath = join(root, 'site.config.json');
   const base = existsSync(cfgPath) ? String(JSON.parse(readFileSync(cfgPath, 'utf8')).handbook_base || '').trim() : '';
-  const homeRows = newest.map((x) => `        ${rowHtml(x, base)}\n`).join('');
+  const home = newest.slice(0, HOME_COUNT);
+  const homeRows = home.map((x) => `        ${rowHtml(x, base)}\n`).join('');
   const projects = JSON.parse(readFileSync(join(root, 'data', 'projects.json'), 'utf8'));
   const logNodes = newest.map((x) => {
     const t = x.text.length > LABEL_MAX ? x.text.slice(0, LABEL_MAX - 1) + '…' : x.text;
-    const node = { id: `log-${x.cts}`, type: 'log', label: `Ep ${x.n} · ${x.date} · ${t}`, date: x.date, url: `/#e-${x.cts}` };
+    const node = { id: `log-${x.cts}`, type: 'log', label: `Ep ${x.n} · ${x.date} · ${t}`, date: x.date, url: `/log/#e-${x.cts}` };
     node.track = slug(x.track);
     return node;
   });
   const nodes = [...projects, ...logNodes];
 
-  // Site-map nav: one item per node, same order as nodes.json; log nodes link to the on-page anchor.
+  // Site-map nav: one item per node, same order as nodes.json; log nodes link to /log/#e-<ts>.
   const mapRows = nodes.map((n) => {
-    const href = n.type === 'log' ? n.url.replace(/^\//, '') : n.url;
-    return `          <li><a href="${esc(href)}" data-node="${esc(n.id)}">${esc(n.label)}</a></li>\n`;
+    return `          <li><a href="${esc(n.url)}" data-node="${esc(n.id)}">${esc(n.label)}</a></li>\n`;
   }).join('');
+  const aboutPath = join(root, 'content', 'about.md');
+  const about = existsSync(aboutPath) ? parseAbout(readFileSync(aboutPath, 'utf8')) : null;
   let withLog = index.slice(0, s) + homeRows + index.slice(e);
+  if (about) { let found = false; withLog = withLog.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, (block) => block.replace(/("jobTitle":)"(?:[^"\\]|\\.)*"/, (_, k) => { found = true; return k + JSON.stringify(about.jobTitle); })); if (!found) throw new Error('index.html: Person JSON-LD jobTitle not found'); }
   const [ss, se] = between(withLog, '<!-- start:start -->\n', '<!-- start:end -->');
   withLog = withLog.slice(0, ss) + startHereHtml(base, true) +withLog.slice(se);
   const [ms, me] = between(withLog, '<!-- sitemap:start -->\n', '<!-- sitemap:end -->');
 
+  const outputs = {
+    'index.html': withLog.slice(0, ms) + mapRows + withLog.slice(me),
+    'log/index.html': archiveHtml(index, valid, base),
+    'data/nodes.json': '[\n' + nodes.map((n) => '  ' + JSON.stringify(n)).join(',\n') + '\n]\n',
+  };
+  const smPath = join(root, 'sitemap.xml');
+  if (about) outputs['about/index.html'] = aboutHtml(index, about);
+  if (existsSync(smPath)) {
+    let sm = readFileSync(smPath, 'utf8').replace(/\r\n/g, '\n');
+    const day = (/<time datetime="(\d{4}-\d{2}-\d{2})"/.exec(index.slice(index.indexOf('foot-ver'))) || [])[1] || null;
+    // Appends a <url> before </urlset> unless its <loc> is already present; lastmod omitted when null.
+    const addUrl = (loc, lastmod) => {
+      if (sm.includes(`<loc>${loc}</loc>`)) return;
+      const lm = lastmod ? `    <lastmod>${lastmod}</lastmod>\n` : '';
+      const end = sm.indexOf('</urlset>');
+      sm = sm.slice(0, end) + `  <url>\n    <loc>${loc}</loc>\n${lm}  </url>\n` + sm.slice(end);
+    };
+    if (about) addUrl('https://alepax.com/about/', day);
+    addUrl('https://alepax.com/AI_Engineering_Handbook/', null);
+    outputs['sitemap.xml'] = sm;
+  }
   return {
-    outputs: {
-      'index.html': withLog.slice(0, ms) + mapRows + withLog.slice(me),
-      'log/index.html': archiveHtml(index, valid, base),
-      'data/nodes.json': '[\n' + nodes.map((n) => '  ' + JSON.stringify(n)).join(',\n') + '\n]\n',
-    },
-    stats: { valid: valid.length, invalid, draft, home: newest.length, archive: valid.length, projects: projects.length, logs: logNodes.length },
+    outputs,
+    stats: { valid: valid.length, invalid, draft, home: home.length, archive: valid.length, projects: projects.length, logs: logNodes.length },
     warnings,
   };
 }
