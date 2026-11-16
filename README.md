@@ -60,7 +60,8 @@ Use the CMS at https://alepax.com/admin/ (on localhost, `/admin/` of the local s
 3. Fields: **Timestamp**, **Made**, **Track** and **Text** are required. **Text** is plain
    text, at most 300 characters, no Markdown. **Cards** are handbook IDs like `L1-001`.
    **Proof** must start with `https://github.com/axadream/` or `https://alepax.com/`.
-   **Prompt trace** is Markdown, at most 1500 characters. **Minutes** is 1-600.
+   Posts with Made **AI-guided** or **Mixed** must have a Proof URL, or the guard fails.
+   **Manual** Proof is optional. **Prompt trace** is Markdown, at most 1500 characters. **Minutes** is 1-600.
    **Draft** entries are skipped by the build.
 4. Made: **AI-guided** is code the AI wrote from your spec. **Manual** is every line typed
    by you. **Mixed** is anything in between. Track: **App**, **AI Study**, **Math** or **3D**.

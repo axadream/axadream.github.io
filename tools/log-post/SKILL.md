@@ -25,7 +25,7 @@ Posts one short practice-log entry to alepax.com through `post.mjs` (in this ski
   - "3D": Blender or other 3D work.
 - Text: at most 300 characters, plain, first person, no markup, no secrets, no names of third parties.
 - `--cards`: optional comma-separated handbook card IDs, format `L<n>-<nnn>` (e.g. `L1-001,L2-010`), only if the user named them.
-- `--proof`: optional https://github.com/axadream/... or https://alepax.com/... link that the user gave or that you verified in this repo's git log.
+- `--proof`: required when `--made` is AI-guided or Mixed (post.mjs refuses without it), optional for Manual; https://github.com/axadream/... or https://alepax.com/... link that the user gave or that you verified in this repo's git log.
 - `--trace`: optional prompt trace, max 1500 characters, only if the user supplied it.
 - `--minutes`: only if the user stated a number.
 - Never pass `--project`; that field is removed.
