@@ -15,6 +15,7 @@ All notable changes to this site are documented here. The format follows
 - Guard: posts with `made` = AI-guided or Mixed fail the build without a `proof` URL. Manual stays optional.
 - CMS hint on the Proof field states the same rule (the field stays `required: false`).
 - Five AI-guided posts gained a `proof` link to the pull request that shipped the work.
+
 ## [1.8.0] - 2026-11-16
 
 ### Added

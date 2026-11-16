@@ -19,7 +19,7 @@ function makeCopy() {
   // Use schema v2 fixtures as the log content so these tests do not depend on the live posts' schema.
   rmSync(join(dir, 'content', 'log'), { recursive: true, force: true });
   mkdirSync(join(dir, 'content', 'log'), { recursive: true });
-  for (const f of ['valid.md']) cpSync(join(here, 'fixtures', 'log', f), join(dir, 'content', 'log', f));
+  for (const f of ['valid.md', 'valid-west.md']) cpSync(join(here, 'fixtures', 'log', f), join(dir, 'content', 'log', f));
   return dir;
 }
 
