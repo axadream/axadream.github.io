@@ -140,7 +140,7 @@ test('build: numbering, escaping, counts, --check round-trip', () => {
     assert.equal(nodes[2].track, '3d');
     assert.ok(nodes.filter((n) => n.type === 'log').every((n) => !('project' in n)));
     const map = /<!-- sitemap:start -->([\s\S]*?)<!-- sitemap:end -->/.exec(home)[1];
-    assert.ok(map.includes('<a href="#e-20261111T033000Z" data-node="log-20261111T033000Z">'));
+    assert.ok(map.includes('<a href="/log/#e-20261111T033000Z" data-node="log-20261111T033000Z">'));
     assert.ok(map.includes('<a href="/OpenHorizon/" data-node="openhorizon">'));
     assert.ok(!/log-ep\d/.test(home));
     assert.ok(r.outputs['log/index.html'].includes('href="/#projects"'));
@@ -216,6 +216,29 @@ test('build: a front matter parse failure throws and names the file', () => {
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('about page, home JSON-LD and content/about.md share one jobTitle', () => {
+  const title = /^jobTitle: "(.+)"$/m.exec(readFileSync(join(repo, 'content', 'about.md'), 'utf8'))[1];
+  assert.equal(title, 'IT and MES consultant');
+  const ld = `"jobTitle":"${title}"`;
+  assert.ok(readFileSync(join(repo, 'about', 'index.html'), 'utf8').includes(ld));
+  assert.ok(readFileSync(join(repo, 'index.html'), 'utf8').includes(ld));
+});
+
+test('sitemap.xml lists exactly 5 URLs including /about/ and the Handbook', () => {
+  const sm = readFileSync(join(repo, 'sitemap.xml'), 'utf8');
+  const locs = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+  assert.equal(locs.length, 5, locs.join(' '));
+  assert.ok(locs.includes('https://alepax.com/about/'));
+  assert.ok(locs.includes('https://alepax.com/AI_Engineering_Handbook/'));
+  assert.ok(!/<loc>https:\/\/alepax\.com\/AI_Engineering_Handbook\/<\/loc>\s*<lastmod>/.test(sm));
+});
+
+test('home log region shows exactly 3 log-row items', () => {
+  const home = readFileSync(join(repo, 'index.html'), 'utf8');
+  const region = home.slice(home.indexOf('<!-- log:start -->'), home.indexOf('<!-- log:end -->'));
+  assert.equal((region.match(/class="log-row"/g) || []).length, 3);
 });
 
 test('log-post schema copy is identical', () => {
