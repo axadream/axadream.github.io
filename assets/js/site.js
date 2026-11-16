@@ -176,15 +176,16 @@ if (!reduced) {
 		play.classList.toggle('play-cue', !on);
 		if (rl) rl.hidden = !on;
 	};
+	const fail = () => { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; };
 	play.addEventListener('click', async () => {
 		if (play.disabled || play.getAttribute('aria-pressed') === 'true') return;
 		play.disabled = true;
 		ui(true);
 		const ok = await start();
 		play.disabled = false;
-		if (!ok) { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; }
+		if (!ok) fail();
 	});
 	if (rl) rl.addEventListener('click', async () => {
-		if (!(await rebuild())) { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; }
+		if (!(await rebuild())) fail();
 	});
 })();
