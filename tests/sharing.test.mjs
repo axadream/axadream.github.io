@@ -154,3 +154,26 @@ test('version from site.config.json is consistent across CHANGELOG and footer', 
   const foot = /<p class="foot-ver">[\s\S]*?<\/p>/.exec(read('index.html'))[0];
   assert.ok(foot.includes(`>v${version}<`), `footer shows v${version}`);
 });
+
+// ---------- footer ----------
+
+test('every generated page footer shows (c) year and version, no date, year is newest non-draft entry year', () => {
+  const version = JSON.parse(read('site.config.json')).version;
+  const dir = join(repo, 'content', 'log');
+  const years = readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => {
+    const fm = /^---\n([\s\S]*?)\n---/.exec(read(`content/log/${f}`).replace(/\r\n/g, '\n'));
+    if (!fm || /^draft:\s*true\s*$/m.test(fm[1])) return null;
+    const ts = /^ts:\s*(\S+)/m.exec(fm[1]);
+    return ts ? Number(ts[1].slice(0, 4)) : null; // year as written in the ts
+  }).filter((y) => y !== null);
+  const newest = Math.max(...years);
+  const re = new RegExp(`<p class="foot-ver">© (\\d{4}) Alex Pintea · <a [^>]*>v${version.replace(/\./g, '\\.')}</a></p>`);
+  for (const p of ['index.html', 'about/index.html', 'log/index.html']) {
+    const html = read(p);
+    const m = re.exec(html);
+    assert.ok(m, `${p}: foot-ver matches`);
+    assert.equal(Number(m[1]), newest, `${p}: year is newest entry year`);
+    assert.doesNotMatch(m[0], /<time/, `${p}: no <time> in foot-ver`);
+    assert.doesNotMatch(html, /all rights reserved/i, `${p}: no "all rights reserved"`);
+  }
+});

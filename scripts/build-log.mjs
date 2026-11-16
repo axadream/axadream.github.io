@@ -469,7 +469,12 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   valid.forEach((e, i) => Object.assign(e, { n: i + 1, cts: compactTs(e.ts) }, localParts(e.ts)));
 
   const newest = [...valid].reverse().slice(0, NODE_COUNT);
-  const index = readFileSync(join(root, 'index.html'), 'utf8').replace(/\r\n/g, '\n');
+  let index = readFileSync(join(root, 'index.html'), 'utf8').replace(/\r\n/g, '\n');
+  // Footer year: newest year among valid non-draft log entries (as written in their ts local parts).
+  // content/about.md has no date field, so it does not contribute. Deterministic: no mtimes, no git dates.
+  const year = valid.length ? Math.max(...valid.map((x) => Number(x.date.slice(0, 4)))) : null;
+  if (!/© \d{4} Alex Pintea/.test(index)) throw new Error('index.html: footer "© <year> Alex Pintea" not found');
+  if (year) index = index.replace(/© \d{4} Alex Pintea/, `© ${year} Alex Pintea`);
   const [s, e] = between(index, '<!-- log:start -->\n', '<!-- log:end -->');
   const cfgPath = join(root, 'site.config.json');
   const base = existsSync(cfgPath) ? String(JSON.parse(readFileSync(cfgPath, 'utf8')).handbook_base || '').trim() : '';
@@ -506,7 +511,7 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   if (about) outputs['about/index.html'] = aboutHtml(index, about);
   if (existsSync(smPath)) {
     let sm = readFileSync(smPath, 'utf8').replace(/\r\n/g, '\n');
-    const day = (/<time datetime="(\d{4}-\d{2}-\d{2})"/.exec(index.slice(index.indexOf('foot-ver'))) || [])[1] || null;
+    const day = valid.length ? valid[valid.length - 1].date : null;
     // Appends a <url> before </urlset> unless its <loc> is already present; lastmod omitted when null.
     const addUrl = (loc, lastmod) => {
       if (sm.includes(`<loc>${loc}</loc>`)) return;

@@ -4,6 +4,13 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.2] - 2026-11-16
+
+### Changed
+
+- The footer shows © <year> Alex Pintea · v<version> with no exact date; the year is computed at build time from the newest non-draft log-entry timestamp.
+- OG images use a deliberate two-line about subtitle broken at the ·, and the name margin is reduced so at least 32 px sit above alepax.com; the subtitle is 48 px. The about OG kicker stays hidden.
+
 ## [1.9.1] - 2026-11-16
 
 ### Changed
