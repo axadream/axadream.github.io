@@ -33,7 +33,7 @@ collections:
         label_singular: Card
         required: false
         field: {label: Card, name: card, widget: string, pattern: ['^L[0-9]-[0-9]{3}$', 'Format L<n>-<nnn>, e.g. L1-001'], required: false}
-      - {label: Proof, name: proof, widget: string, pattern: ['^https://(github\.com/axadream/|alepax\.com/).+', 'GitHub (axadream) or alepax.com link'], hint: 'GitHub (axadream) or alepax.com link', required: false}
+      - {label: Proof, name: proof, widget: string, pattern: ['^https://(github\.com/axadream/|alepax\.com/).+', 'GitHub (axadream) or alepax.com link'], hint: 'GitHub (axadream) or alepax.com link. Required when Made is AI-guided or Mixed; the build guard fails without it.', required: false}
       - {label: Prompt trace, name: trace, widget: markdown, maxlength: 1500, required: false}
       - {label: Minutes, name: minutes, widget: number, value_type: int, min: 1, max: 600, required: false}
       - {label: Draft, name: draft, widget: boolean, default: false, required: false}

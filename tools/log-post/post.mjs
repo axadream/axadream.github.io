@@ -90,6 +90,7 @@ export function validateEntry(obj) {
     }
     if (k === 'ts' && typeof v === 'string' && Number.isNaN(Date.parse(v))) errs.push('"ts" is not a valid date-time');
   }
+  if ((obj.made === 'AI-guided' || obj.made === 'Mixed') && !obj.proof) errs.push(`made=${obj.made} requires proof`);
   return errs;
 }
 

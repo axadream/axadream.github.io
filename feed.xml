@@ -11,14 +11,14 @@
     <title>Ep 14 · App</title>
     <link href="https://alepax.com/log/#e-20261116T080200Z"/>
     <updated>2026-11-16T08:02:00.000Z</updated>
-    <summary>improved the log entry with more displayed details. Done</summary>
+    <summary>Log entries now link their cards to the AI Engineering Handbook, and alepax.com has a Handbook button plus a home line pointing to the log.</summary>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261115T212000Z</id>
     <title>Ep 13 · App</title>
     <link href="https://alepax.com/log/#e-20261115T212000Z"/>
     <updated>2026-11-15T21:20:00.000Z</updated>
-    <summary>added some fixes and improvements to alepax.com. This is done.</summary>
+    <summary>Shipped log schema v2 on alepax.com: made and track fields, a legend, badges and a Start-here block, with proof links limited to the project&#39;s own sites.</summary>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261114T213100Z</id>
@@ -32,7 +32,7 @@
     <title>Ep 11 · App</title>
     <link href="https://alepax.com/log/#e-20261114T135300Z"/>
     <updated>2026-11-14T13:53:00.000Z</updated>
-    <summary>working on alepax.com</summary>
+    <summary>Added a guard policy to alepax.com that warns on stale generated outputs by default, with a --strict mode that fails them, plus tests for it.</summary>
   </entry>
   <entry>
     <id>https://alepax.com/log/#e-20261114T134028Z</id>
