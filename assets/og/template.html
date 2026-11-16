@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
@@ -9,8 +9,9 @@
 	.card { position: relative; box-sizing: border-box; width: 1200px; height: 630px; padding: 72px 80px; }
 	.bar { position: absolute; left: 0; top: 0; width: 16px; height: 630px; background: var(--accent); }
 	.kicker { margin: 0; font-size: 30px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
-	.name { margin: 120px 0 0; font-size: 150px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
-	.title { margin: 28px 0 0; font-size: 44px; line-height: 1.2; max-width: 1040px; }
+	.name { margin: 56px 0 0; font-size: 150px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+	.title { margin: 28px 0 0; font-size: 48px; line-height: 1.2; max-width: 1040px; }
+	.title .ln { display: block; white-space: nowrap; }
 	.mark { position: absolute; left: 80px; bottom: 64px; font-size: 34px; letter-spacing: 0.02em; }
 </style>
 </head>
@@ -27,7 +28,13 @@
 	var k = document.getElementById('kicker');
 	k.textContent = q.get('type') || '';
 	if (q.get('kicker') === '0') k.style.visibility = 'hidden'; // keeps the layout identical across images
-	document.getElementById('title').textContent = q.get('title') || '';
+	var t = document.getElementById('title');
+	(q.get('title') || '').split('\n').forEach(function (line) {
+		var s = document.createElement('span');
+		s.className = 'ln';
+		s.textContent = line;
+		t.appendChild(s);
+	});
 </script>
 </body>
 </html>
