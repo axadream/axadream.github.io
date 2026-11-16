@@ -4,6 +4,17 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-11-16
+
+### Added
+
+- Atom feed at `/feed.xml` of non-draft log entries, newest first, with `alternate` head links on `/` and `/log/`.
+
+### Changed
+
+- Guard: posts with `made` = AI-guided or Mixed fail the build without a `proof` URL. Manual stays optional.
+- CMS hint on the Proof field states the same rule (the field stays `required: false`).
+
 ## [1.3.0] - 2026-11-16
 
 ### Changed

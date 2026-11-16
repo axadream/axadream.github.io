@@ -19,7 +19,7 @@ function makeCopy() {
   // Use schema v2 fixtures as the log content so these tests do not depend on the live posts' schema.
   rmSync(join(dir, 'content', 'log'), { recursive: true, force: true });
   mkdirSync(join(dir, 'content', 'log'), { recursive: true });
-  for (const f of ['valid.md', 'valid-west.md']) cpSync(join(here, 'fixtures', 'log', f), join(dir, 'content', 'log', f));
+  for (const f of ['valid.md']) cpSync(join(here, 'fixtures', 'log', f), join(dir, 'content', 'log', f));
   return dir;
 }
 
@@ -66,6 +66,34 @@ test('stale build outputs: default warns and passes, strict fails', () => {
   const strict = guard(dir, ['--strict']);
   assert.equal(strict.status, 1, strict.stdout + strict.stderr);
 });
+
+function proofCase(name) {
+  const dir = makeCopy();
+  cpSync(join(here, 'fixtures', 'guard-proof', name + '.md'), join(dir, 'content', 'log', name + '.md'));
+  assert.equal(run(dir, [join(dir, 'scripts', 'build-log.mjs')]).status, 0);
+  return dir;
+}
+
+for (const [name, made] of [['ai-no-proof', 'AI-guided'], ['mixed-no-proof', 'Mixed']]) {
+  test(`proof rule: ${made} without proof fails (default and strict)`, () => {
+    const dir = proofCase(name);
+    for (const extra of [[], ['--strict']]) {
+      const r = guard(dir, extra);
+      assert.equal(r.status, 1, r.stdout + r.stderr);
+      assert.match(r.stdout, new RegExp(`content/log/${name}\\.md: made=${made} requires proof`));
+    }
+  });
+}
+
+for (const name of ['manual-no-proof', 'ai-proof']) {
+  test(`proof rule: ${name} passes (default and strict)`, () => {
+    const dir = proofCase(name);
+    for (const extra of [[], ['--strict']]) {
+      const r = guard(dir, extra);
+      assert.equal(r.status, 0, r.stdout + r.stderr);
+    }
+  });
+}
 
 test('user-action load: site.js graph import without the marker fails the guard', () => {
   const dir = makeCopy();

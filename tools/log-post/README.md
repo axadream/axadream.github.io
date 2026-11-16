@@ -31,7 +31,7 @@ Token: `$env:ALEPAX_LOG_TOKEN = '<token>'` (fine-grained PAT, repo axadream.gith
 | Flag | Meaning |
 |---|---|
 | `--text --made --track` | required entry text (max 300), made (`AI-guided`, `Manual`, `Mixed`) and track (`App`, `AI Study`, `Math`, `3D`) |
-| `--cards --proof --trace --minutes --draft` | optional fields (`--cards` comma-separated `L<n>-<nnn>`; `--proof` github.com/axadream or alepax.com https URL; `--trace` max 1500) |
+| `--cards --proof --trace --minutes --draft` | optional fields, but `--proof` is required for AI-guided/Mixed (`--cards` comma-separated `L<n>-<nnn>`; `--proof` github.com/axadream or alepax.com https URL; `--trace` max 1500) |
 | `--ts` | ISO 8601 with offset (default: now, local offset) |
 | `--cwd` | directory checked against the allowlist |
 | `--dry` | preview, exit 0, no token or network |

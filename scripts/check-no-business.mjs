@@ -235,7 +235,12 @@ try {
   for (const f of logFiles) {
     let errs;
     try {
-      errs = validateEntry(parseEntryFile(await readFile(join(logDir, f), 'utf8')));
+      const entry = parseEntryFile(await readFile(join(logDir, f), 'utf8'));
+      errs = validateEntry(entry);
+      // Conditional rule (schema allOf/if-then): AI-guided and Mixed posts need proof; drafts included.
+      if ((entry.made === 'AI-guided' || entry.made === 'Mixed') && !entry.proof) {
+        errs.push(`made=${entry.made} requires proof`);
+      }
     } catch (e) {
       errs = [e.message];
     }

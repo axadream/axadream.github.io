@@ -5,6 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["ts", "made", "track", "text"],
+  "allOf": [
+    {
+      "if": { "properties": { "made": { "enum": ["AI-guided", "Mixed"] } }, "required": ["made"] },
+      "then": { "required": ["proof"], "properties": { "proof": { "minLength": 1 } } }
+    }
+  ],
   "properties": {
     "ts": {
       "type": "string",

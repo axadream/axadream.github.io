@@ -228,6 +228,27 @@ function rowHtml(e, handbookBase = '') {
     `<span class="log-note">${esc(e.text)}${min}${proof}</span>${trace}</li>`;
 }
 
+/** Atom 1.0 feed of non-draft entries, newest first. Deterministic: updated = newest entry ts. */
+export function feedXml(entries) {
+  const list = [...entries].reverse();
+  const iso = (ts) => new Date(ts).toISOString().replace(/\.\d+Z$/, 'Z');
+  const updated = list.length ? iso(list[0].ts) : '1970-01-01T00:00:00Z';
+  const items = list.map((e) => {
+    const proof = e.proof ? `<p><a href="${esc(e.proof)}">Proof</a></p>` : '';
+    const html = `<p>${esc(e.text)}</p>${proof}`;
+    return `  <entry>\n    <id>https://alepax.com/log/#e-${e.cts}</id>\n` +
+      `    <title>${esc(`Ep ${e.n} · ${e.track} · ${e.made}`)}</title>\n` +
+      `    <link rel="alternate" type="text/html" href="https://alepax.com/log/#e-${e.cts}"/>\n` +
+      `    <updated>${iso(e.ts)}</updated>\n` +
+      `    <content type="html">${esc(html)}</content>\n  </entry>\n`;
+  }).join('');
+  return `<?xml version="1.0" encoding="utf-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom">\n` +
+    `  <id>https://alepax.com/feed.xml</id>\n  <title>alepax log</title>\n` +
+    `  <link rel="self" type="application/atom+xml" href="https://alepax.com/feed.xml"/>\n` +
+    `  <link rel="alternate" type="text/html" href="https://alepax.com/log/"/>\n` +
+    `  <updated>${updated}</updated>\n  <author><name>Alex Pintea</name></author>\n${items}</feed>\n`;
+}
+
 function between(html, startTag, endTag) {
   const a = html.indexOf(startTag), b = html.indexOf(endTag);
   if (a < 0 || b < a) throw new Error(`index.html: markers ${startTag} / ${endTag} not found`);
@@ -271,6 +292,7 @@ function archiveHtml(index, entries, base) {
 <title>Log · alepax</title>
 <meta name="description" content="Archive of Alex Pintea's daily practice log: ${n} ${n === 1 ? 'entry' : 'entries'}.">
 <link rel="canonical" href="https://alepax.com/log/">
+<link rel="alternate" type="application/atom+xml" title="alepax log" href="/feed.xml">
 <meta name="theme-color" content="#0F1115" id="tc">
 <meta name="color-scheme" content="dark">
 ${themeScript}
@@ -357,6 +379,7 @@ export function build({ root = ROOT_DEFAULT } = {}) {
     outputs: {
       'index.html': withLog.slice(0, ms) + mapRows + withLog.slice(me),
       'log/index.html': archiveHtml(index, valid, base),
+      'feed.xml': feedXml(valid),
       'data/nodes.json': '[\n' + nodes.map((n) => '  ' + JSON.stringify(n)).join(',\n') + '\n]\n',
     },
     stats: { valid: valid.length, invalid, draft, home: newest.length, archive: valid.length, projects: projects.length, logs: logNodes.length },

@@ -1,6 +1,7 @@
 [
   {"id":"openhorizon","type":"project","status":"released","label":"OpenHorizon","updated":"2026-11-11","url":"/OpenHorizon/"},
   {"id":"next-ai-project","type":"project","status":"planned","label":"Next AI project: RAG or agent, with evals","title":"Next AI project","url":"#projects"},
+  {"id":"log-20261116T080200Z","type":"log","label":"Ep 14 · 2026-11-16 · improved the log entry with more displayed details","date":"2026-11-16","url":"/#e-20261116T080200Z","track":"app"},
   {"id":"log-20261115T212000Z","type":"log","label":"Ep 13 · 2026-11-15 · added some fixes and improvements to alepax.com","date":"2026-11-15","url":"/#e-20261115T212000Z","track":"app"},
   {"id":"log-20261114T213100Z","type":"log","label":"Ep 12 · 2026-11-14 · some fixes related to the log admin from alepax.com","date":"2026-11-14","url":"/#e-20261114T213100Z","track":"app"},
   {"id":"log-20261114T135300Z","type":"log","label":"Ep 11 · 2026-11-14 · working on alepax.com","date":"2026-11-14","url":"/#e-20261114T135300Z","track":"app"},
@@ -11,6 +12,5 @@
   {"id":"log-20261105T190000Z","type":"log","label":"Ep 6 · 2026-11-05 · 50 minutes of coding and explanations for the AI path.","date":"2026-11-05","url":"/#e-20261105T190000Z","track":"ai-study"},
   {"id":"log-20261104T190000Z","type":"log","label":"Ep 5 · 2026-11-04 · Several minutes of coding and explanations for the AI path.","date":"2026-11-04","url":"/#e-20261104T190000Z","track":"ai-study"},
   {"id":"log-20261103T190000Z","type":"log","label":"Ep 4 · 2026-11-03 · Almost 1 hour writing code requested by my AI Engineering g…","date":"2026-11-03","url":"/#e-20261103T190000Z","track":"ai-study"},
-  {"id":"log-20261102T190000Z","type":"log","label":"Ep 3 · 2026-11-02 · Completed a function requested by the AI path plan. Floor d…","date":"2026-11-02","url":"/#e-20261102T190000Z","track":"ai-study"},
-  {"id":"log-20261101T190000Z","type":"log","label":"Ep 2 · 2026-11-01 · Several lines of code in my AI Engineering path.","date":"2026-11-01","url":"/#e-20261101T190000Z","track":"ai-study"}
+  {"id":"log-20261102T190000Z","type":"log","label":"Ep 3 · 2026-11-02 · Completed a function requested by the AI path plan. Floor d…","date":"2026-11-02","url":"/#e-20261102T190000Z","track":"ai-study"}
 ]
