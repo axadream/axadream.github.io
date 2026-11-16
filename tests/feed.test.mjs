@@ -11,7 +11,7 @@ const repo = join(here, '..');
 
 function tempRoot(files) {
   const root = mkdtempSync(join(tmpdir(), 'feed-'));
-  for (const f of ['index.html', 'schema/log-entry.schema.json', 'data/projects.json']) {
+  for (const f of ['index.html', 'schema/log-entry.schema.json', 'data/projects.json', 'site.config.json']) {
     mkdirSync(dirname(join(root, f)), { recursive: true });
     copyFileSync(join(repo, f), join(root, f));
   }
