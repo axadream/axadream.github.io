@@ -1,6 +1,6 @@
 {
-  "version": "1.2.0",
-  "handbook_base": "",
+  "version": "1.2.1",
+  "handbook_base": "https://alepax.com/AI_Engineering_Handbook/",
   "graph": {
     "maxNodes": 14
   },

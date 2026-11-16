@@ -4,6 +4,13 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-11-16
+
+### Added
+
+- `handbook_base` set to the live AI Engineering Handbook; log card IDs link to `#<id>`.
+- "Handbook" button in Start-here; home line pointing to `/log/` for labels and all entries.
+
 ## [1.2.0] - 2026-11-15
 
 ### Added
