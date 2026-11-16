@@ -10,7 +10,7 @@
 	.bar { position: absolute; left: 0; top: 0; width: 16px; height: 630px; background: var(--accent); }
 	.kicker { margin: 0; font-size: 30px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
 	.name { margin: 120px 0 0; font-size: 150px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
-	.title { margin: 28px 0 0; font-size: 48px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.title { margin: 28px 0 0; font-size: 44px; line-height: 1.2; max-width: 1040px; }
 	.mark { position: absolute; left: 80px; bottom: 64px; font-size: 34px; letter-spacing: 0.02em; }
 </style>
 </head>
@@ -24,7 +24,9 @@
 </div>
 <script>
 	var q = new URLSearchParams(location.search);
-	document.getElementById('kicker').textContent = q.get('type') || '';
+	var k = document.getElementById('kicker');
+	k.textContent = q.get('type') || '';
+	if (q.get('kicker') === '0') k.style.visibility = 'hidden'; // keeps the layout identical across images
 	document.getElementById('title').textContent = q.get('title') || '';
 </script>
 </body>

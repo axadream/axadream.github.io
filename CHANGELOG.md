@@ -4,6 +4,14 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.1] - 2026-11-16
+
+### Changed
+
+- og-about: subtitle now reads "Industrial IT & MES Consultant · Building in applied AI and 3D"; the duplicate ABOUT kicker is hidden on that card.
+- og-home regenerated (same subtitle "Applied AI, math and 3D, built in public").
+- /about/ is marked `og:type` profile with `profile:first_name` Alex and `profile:last_name` Pintea.
+
 ## [1.9.0] - 2026-11-16
 
 ### Added

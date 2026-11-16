@@ -126,6 +126,24 @@ test('about/ has Person and ProfilePage JSON-LD that parse', () => {
   assert.ok(types.includes('ProfilePage'), 'ProfilePage block');
 });
 
+// ---------- Open Graph type ----------
+
+test('about/ is an og:type profile with first and last name', () => {
+  const html = read('about/index.html');
+  assert.deepEqual(metaContent(html, 'property', 'og:type'), ['profile'], 'og:type profile');
+  assert.deepEqual(metaContent(html, 'property', 'profile:first_name'), ['Alex'], 'first name');
+  assert.deepEqual(metaContent(html, 'property', 'profile:last_name'), ['Pintea'], 'last name');
+});
+
+for (const p of ['index.html', 'log/index.html']) {
+  test(`${p} is og:type website without profile tags`, () => {
+    const html = read(p);
+    assert.deepEqual(metaContent(html, 'property', 'og:type'), ['website'], 'og:type website');
+    assert.equal(metaContent(html, 'property', 'profile:first_name').length, 0, 'no profile:first_name');
+    assert.equal(metaContent(html, 'property', 'profile:last_name').length, 0, 'no profile:last_name');
+  });
+}
+
 // ---------- version ----------
 
 test('version from site.config.json is consistent across CHANGELOG and footer', () => {
