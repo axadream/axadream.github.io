@@ -177,15 +177,16 @@ if (!reduced) {
 		if (rl) rl.hidden = !on;
 	};
 	const fail = () => { ui(false); if (lab) lab.textContent = 'Graph could not load. Try again.'; };
+	const note = () => { if (lab) lab.textContent = reduced && !force ? 'Motion reduced by your system setting; drag still works' : ''; };
 	play.addEventListener('click', async () => {
 		if (play.disabled || play.getAttribute('aria-pressed') === 'true') return;
 		play.disabled = true;
 		ui(true);
 		const ok = await start();
 		play.disabled = false;
-		if (!ok) fail();
+		if (!ok) fail(); else note();
 	});
 	if (rl) rl.addEventListener('click', async () => {
-		if (!(await rebuild())) fail();
+		if (!(await rebuild())) fail(); else note();
 	});
 })();

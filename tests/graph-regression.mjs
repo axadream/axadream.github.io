@@ -222,6 +222,29 @@ try {
 		report('F exactly one three.module request after Reload', three === 1, `three=${three}`);
 		await ctx.close();
 	}
+	// (G) reduced-motion note after Play (1280x800); with motion allowed the label stays empty and the graph drifts
+	{
+		const MSG = 'Motion reduced by your system setting; drag still works';
+		const label = (page) => page.evaluate(() => (document.getElementById('graph-label')?.textContent || '').trim());
+		const vp = { width: 1280, height: 800 };
+		const r = await openPage({ reducedMotion: 'reduce', viewport: vp }, 'reduce');
+		const upR = await play(r.page);
+		await sleep(300);
+		const textR = upR ? await label(r.page) : '<no graph>';
+		report('G reduced motion: label shows the note after Play', upR && textR === MSG, `label=${JSON.stringify(textR)}`);
+		await r.ctx.close();
+
+		const o = await openPage({ reducedMotion: 'no-preference', viewport: vp }, 'force');
+		const upO = await play(o.page);
+		await sleep(300);
+		const textO = upO ? await label(o.page) : '<no graph>';
+		const q0 = upO ? await pos(o.page) : {};
+		await sleep(3000);
+		const q1 = upO ? await pos(o.page) : {};
+		const disp = Math.max(0, ...Object.keys(q0).map((k) => (q1[k] ? dist(q0[k], q1[k]) : 0)));
+		report('G motion allowed: label empty and nodes drift >2px in 3 s', upO && textO === '' && disp > 2, `label=${JSON.stringify(textO)} disp=${disp.toFixed(1)}px`);
+		await o.ctx.close();
+	}
 } finally {
 	await browser.close();
 	server.close();
