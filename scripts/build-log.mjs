@@ -257,6 +257,59 @@ const LEGEND_HTML = `<section class="log-legend" aria-label="Legend">
   </section>
 `;
 
+/** Open Graph / Twitter card tags plus the Atom alternate link. Inputs are plain text. */
+export function metaTags({ title, desc, url, image }) {
+  const img = `https://alepax.com/assets/img/${image}`;
+  return [
+    '<meta property="og:type" content="website">',
+    '<meta property="og:site_name" content="Alex Pintea">',
+    `<meta property="og:title" content="${esc(title)}">`,
+    `<meta property="og:description" content="${esc(desc)}">`,
+    `<meta property="og:url" content="${esc(url)}">`,
+    `<meta property="og:image" content="${esc(img)}">`,
+    '<meta property="og:image:width" content="1200">',
+    '<meta property="og:image:height" content="630">',
+    '<meta name="twitter:card" content="summary_large_image">',
+    `<meta name="twitter:title" content="${esc(title)}">`,
+    `<meta name="twitter:description" content="${esc(desc)}">`,
+    `<meta name="twitter:image" content="${esc(img)}">`,
+    '<link rel="alternate" type="application/atom+xml" title="Practice log" href="https://alepax.com/feed.xml">',
+  ].join('\n');
+}
+
+const ld = (o) => `<script type="application/ld+json">\n${JSON.stringify(o).replace(/</g, '\\u003c')}\n</script>\n`;
+
+const FEED_COUNT = 10;
+const newestFirst = (list, n) => [...list].reverse().slice(0, n);
+
+/** Atom 1.0 feed of the newest entries. Deterministic: `updated` is the newest entry timestamp. */
+export function feedXml(entries) {
+  const newest = newestFirst(entries, FEED_COUNT);
+  const iso = (ts) => new Date(ts).toISOString();
+  const updated = newest.length ? iso(newest[0].ts) : '1970-01-01T00:00:00.000Z';
+  const items = newest.map((e) => {
+    const url = `https://alepax.com/log/#e-${e.cts}`;
+    return `  <entry>
+    <id>${esc(url)}</id>
+    <title>${esc(`Ep ${e.n} · ${e.track}`)}</title>
+    <link href="${esc(url)}"/>
+    <updated>${iso(e.ts)}</updated>
+    <summary>${esc(e.text)}</summary>
+  </entry>
+`;
+  }).join('');
+  return `<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://alepax.com/feed.xml</id>
+  <title>Alex Pintea — practice log</title>
+  <link rel="self" type="application/atom+xml" href="https://alepax.com/feed.xml"/>
+  <link rel="alternate" type="text/html" href="https://alepax.com/log/"/>
+  <updated>${updated}</updated>
+  <author><name>Alex Pintea</name><uri>https://alepax.com/</uri></author>
+${items}</feed>
+`;
+}
+
 /** Shared page chrome taken from index.html: head template, header (nav fixed for sub-pages), footer. */
 function chrome(index, { aboutCurrent = false } = {}) {
   const themeScript = (/<script>try\{var t=localStorage\.theme[\s\S]*?<\/script>/.exec(index) || [])[0];
@@ -265,17 +318,21 @@ function chrome(index, { aboutCurrent = false } = {}) {
   if (!themeScript || !header || !footer) throw new Error('index.html: theme script, header or footer not found');
   let nav = header.replace('href="#projects"', 'href="/#projects"').replace('href="#log"', aboutCurrent ? 'href="/log/"' : 'href="/#log"');
   if (aboutCurrent) { const navAbout = nav.replace('<a href="/about/">', '<a href="/about/" aria-current="page">'); if (navAbout === nav) throw new Error('index.html header: About link not found'); nav = navAbout; }
-  const head = (title, desc, canonical, extra = '') => `<!doctype html>
+  // title/desc are plain text (escaped here); image is a file name under /assets/img/.
+  const head = (title, desc, canonical, extra, image) => {
+  if (image === undefined) throw new Error('head(): image is required');
+  return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${title}</title>
-<meta name="description" content="${desc}">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${canonical}">
 <meta name="theme-color" content="#0F1115" id="tc">
 <meta name="color-scheme" content="dark">
 ${themeScript}
+${metaTags({ title, desc, url: canonical, image })}
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/img/favicon.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
@@ -288,6 +345,7 @@ ${extra}</head>
 ${nav}
 
 `;
+  };
   return { head, footer };
 }
 
@@ -307,11 +365,10 @@ function aboutHtml(index, about) {
   if (about.paras.length < 5) throw new Error('content/about.md: expected title, location, 2 paragraphs, education');
   const [titleLine, location, p1, p2, edu] = about.paras;
   const first = p1.split(/(?<=\.)\s/)[0];
-  const ld = (o) => `<script type="application/ld+json">\n${JSON.stringify(o).replace(/</g, '\\u003c')}\n</script>\n`;
   const person = { '@context': 'https://schema.org', '@type': 'Person', ...PERSON, jobTitle: about.jobTitle };
   const page = { '@context': 'https://schema.org', '@type': 'ProfilePage', url: 'https://alepax.com/about/', mainEntity: { '@type': 'Person', name: PERSON.name, url: PERSON.url } };
   const tile = (href, title, text) => `      <a class="card about-tile" href="${href}"><h3>${title}</h3><p>${text}</p><span class="about-arrow" aria-hidden="true">→</span></a>\n`;
-  return head('About — Alex Pintea', esc(first), 'https://alepax.com/about/', ld(person) + ld(page)) + `<main id="main">
+  return head('About — Alex Pintea', first, 'https://alepax.com/about/', ld(person) + ld(page), 'og-about.png') + `<main id="main">
   <section class="about-hero" aria-labelledby="about-name">
     <div class="wrap">
       <h1 id="about-name" class="about-name">Alex Pintea</h1>
@@ -360,7 +417,14 @@ function archiveHtml(index, entries, base) {
   const { head, footer } = chrome(index);
   const n = entries.length;
   const rows = [...entries].reverse().map((e) => `      ${rowHtml(e, base)}`).join('\n');
-  return head('Log · alepax', `Archive of Alex Pintea's daily practice log: ${n} ${n === 1 ? 'entry' : 'entries'}.`, 'https://alepax.com/log/') + `<main id="main" class="wrap">
+  const author = { '@type': 'Person', name: PERSON.name, url: PERSON.url };
+  const blog = {
+    '@context': 'https://schema.org', '@type': 'Blog', name: 'Practice log', url: 'https://alepax.com/log/', author,
+    blogPost: newestFirst(entries, FEED_COUNT).map((e) => ({
+      '@type': 'BlogPosting', headline: `Ep ${e.n} · ${e.track}`, url: `https://alepax.com/log/#e-${e.cts}`, datePublished: e.date, author,
+    })),
+  };
+  return head('Log · alepax', `Archive of Alex Pintea's daily practice log: ${n} ${n === 1 ? 'entry' : 'entries'}.`, 'https://alepax.com/log/', ld(blog), 'og-log.png') + `<main id="main" class="wrap">
   <h1 class="section-title">Practice log</h1>
   ${startHereHtml(base)}  ${LEGEND_HTML}  <div class="card log-card">
     <p class="log-intro">Daily practice log. ${n} ${n === 1 ? 'entry' : 'entries'}.</p>
@@ -434,6 +498,7 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   const outputs = {
     'index.html': withLog.slice(0, ms) + mapRows + withLog.slice(me),
     'log/index.html': archiveHtml(index, valid, base),
+    'feed.xml': feedXml(valid),
     'data/nodes.json': '[\n' + nodes.map((n) => '  ' + JSON.stringify(n)).join(',\n') + '\n]\n',
   };
   const smPath = join(root, 'sitemap.xml');

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <id>https://alepax.com/feed.xml</id>
+  <title>Alex Pintea — practice log</title>
+  <link rel="self" type="application/atom+xml" href="https://alepax.com/feed.xml"/>
+  <link rel="alternate" type="text/html" href="https://alepax.com/log/"/>
+  <updated>2026-11-16T08:02:00.000Z</updated>
+  <author><name>Alex Pintea</name><uri>https://alepax.com/</uri></author>
+  <entry>
+    <id>https://alepax.com/log/#e-20261116T080200Z</id>
+    <title>Ep 14 · App</title>
+    <link href="https://alepax.com/log/#e-20261116T080200Z"/>
+    <updated>2026-11-16T08:02:00.000Z</updated>
+    <summary>improved the log entry with more displayed details. Done</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261115T212000Z</id>
+    <title>Ep 13 · App</title>
+    <link href="https://alepax.com/log/#e-20261115T212000Z"/>
+    <updated>2026-11-15T21:20:00.000Z</updated>
+    <summary>added some fixes and improvements to alepax.com. This is done.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261114T213100Z</id>
+    <title>Ep 12 · App</title>
+    <link href="https://alepax.com/log/#e-20261114T213100Z"/>
+    <updated>2026-11-14T21:31:00.000Z</updated>
+    <summary>some fixes related to the log admin from alepax.com</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261114T135300Z</id>
+    <title>Ep 11 · App</title>
+    <link href="https://alepax.com/log/#e-20261114T135300Z"/>
+    <updated>2026-11-14T13:53:00.000Z</updated>
+    <summary>working on alepax.com</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261114T134028Z</id>
+    <title>Ep 10 · App</title>
+    <link href="https://alepax.com/log/#e-20261114T134028Z"/>
+    <updated>2026-11-14T13:40:28.000Z</updated>
+    <summary>Log pipeline is live. Three gated branches merged through pull requests, Pages switched to GitHub Actions, release tags added. Claude Code ran the steps from my gate prompts; I reviewed every report before the next gate.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261109T190000Z</id>
+    <title>Ep 9 · AI Study</title>
+    <link href="https://alepax.com/log/#e-20261109T190000Z"/>
+    <updated>2026-11-09T19:00:00.000Z</updated>
+    <summary>69 minutes on the AI path.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261107T190000Z</id>
+    <title>Ep 8 · AI Study</title>
+    <link href="https://alepax.com/log/#e-20261107T190000Z"/>
+    <updated>2026-11-07T19:00:00.000Z</updated>
+    <summary>Over 1 hour on the AI path.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261106T190000Z</id>
+    <title>Ep 7 · AI Study</title>
+    <link href="https://alepax.com/log/#e-20261106T190000Z"/>
+    <updated>2026-11-06T19:00:00.000Z</updated>
+    <summary>Over 50 minutes on the AI path.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261105T190000Z</id>
+    <title>Ep 6 · AI Study</title>
+    <link href="https://alepax.com/log/#e-20261105T190000Z"/>
+    <updated>2026-11-05T19:00:00.000Z</updated>
+    <summary>50 minutes of coding and explanations for the AI path.</summary>
+  </entry>
+  <entry>
+    <id>https://alepax.com/log/#e-20261104T190000Z</id>
+    <title>Ep 5 · AI Study</title>
+    <link href="https://alepax.com/log/#e-20261104T190000Z"/>
+    <updated>2026-11-04T19:00:00.000Z</updated>
+    <summary>Several minutes of coding and explanations for the AI path.</summary>
+  </entry>
+</feed>
