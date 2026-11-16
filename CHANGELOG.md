@@ -4,6 +4,12 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.3] - 2026-11-16
+
+### Changed
+
+- og:image and twitter:image URLs get ?v=<site version> to bust social-card caches.
+
 ## [1.9.2] - 2026-11-16
 
 ### Changed

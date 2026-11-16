@@ -112,7 +112,7 @@ function tempRoot(files, config) {
     mkdirSync(dirname(join(root, f)), { recursive: true });
     copyFileSync(join(repo, f), join(root, f));
   }
-  if (config) writeFileSync(join(root, 'site.config.json'), JSON.stringify(config));
+  writeFileSync(join(root, 'site.config.json'), JSON.stringify({ version: '0.0.0', ...config }));
   mkdirSync(join(root, 'content', 'log'), { recursive: true });
   for (const f of files || readdirSync(join(here, 'fixtures', 'log'))) copyFileSync(join(here, 'fixtures', 'log', f), join(root, 'content', 'log', f));
   return root;

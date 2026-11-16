@@ -47,7 +47,7 @@ for (const p of pages()) {
     const images = metaContent(html, 'property', 'og:image');
     assert.equal(images.length, 1, 'exactly one og:image');
     assert.ok(images[0].startsWith(IMG_BASE), `og:image under ${IMG_BASE}`);
-    const name = images[0].slice(IMG_BASE.length);
+    const name = images[0].slice(IMG_BASE.length).split('?')[0];
     assert.ok(existsSync(join(repo, 'assets', 'img', name)), `${name} exists`);
     assert.ok(statSync(join(repo, 'assets', 'img', name)).size <= MAX, `${name} <= ${MAX} B`);
 
@@ -63,6 +63,18 @@ for (const p of pages()) {
     assert.deepEqual(feedLinks, [FEED_URL], 'exactly one Atom alternate link to /feed.xml');
   });
 }
+
+test('og:image and twitter:image carry ?v=<site version> on index, about, log', () => {
+  const version = JSON.parse(read('site.config.json')).version;
+  for (const p of ['index.html', 'about/index.html', 'log/index.html']) {
+    const html = read(p);
+    for (const [attr, name] of [['property', 'og:image'], ['name', 'twitter:image']]) {
+      const v = metaContent(html, attr, name);
+      assert.equal(v.length, 1, `${p}: exactly one ${name}`);
+      assert.ok(v[0].endsWith(`?v=${version}`), `${p}: ${name} ends with ?v=${version}`);
+    }
+  }
+});
 
 // ---------- b) generated share images ----------
 

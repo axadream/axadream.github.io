@@ -258,8 +258,9 @@ const LEGEND_HTML = `<section class="log-legend" aria-label="Legend">
 `;
 
 /** Open Graph / Twitter card tags plus the Atom alternate link. Inputs are plain text. */
-export function metaTags({ title, desc, url, image, profile = false }) {
-  const img = `https://alepax.com/assets/img/${image}`;
+export function metaTags({ title, desc, url, image, version, profile = false }) {
+  if (!version) throw new Error('metaTags(): version is required');
+  const img = `https://alepax.com/assets/img/${image}?v=${version}`;
   return [
     `<meta property="og:type" content="${profile ? 'profile' : 'website'}">`,
     ...(profile ? ['<meta property="profile:first_name" content="Alex">', '<meta property="profile:last_name" content="Pintea">'] : []),
@@ -312,7 +313,7 @@ ${items}</feed>
 }
 
 /** Shared page chrome taken from index.html: head template, header (nav fixed for sub-pages), footer. */
-function chrome(index, { aboutCurrent = false } = {}) {
+function chrome(index, version, { aboutCurrent = false } = {}) {
   const themeScript = (/<script>try\{var t=localStorage\.theme[\s\S]*?<\/script>/.exec(index) || [])[0];
   const header = (/<header class="site-header">[\s\S]*?<\/header>/.exec(index) || [])[0];
   const footer = (/<footer class="site-footer">[\s\S]*?<\/footer>/.exec(index) || [])[0];
@@ -333,7 +334,7 @@ function chrome(index, { aboutCurrent = false } = {}) {
 <meta name="theme-color" content="#0F1115" id="tc">
 <meta name="color-scheme" content="dark">
 ${themeScript}
-${metaTags({ title, desc, url: canonical, image, profile })}
+${metaTags({ title, desc, url: canonical, image, version, profile })}
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/img/favicon.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
@@ -361,8 +362,8 @@ export function parseAbout(text) {
   return { jobTitle: o.jobTitle.trim(), paras };
 }
 
-function aboutHtml(index, about) {
-  const { head, footer } = chrome(index, { aboutCurrent: true });
+function aboutHtml(index, about, version) {
+  const { head, footer } = chrome(index, version, { aboutCurrent: true });
   if (about.paras.length < 5) throw new Error('content/about.md: expected title, location, 2 paragraphs, education');
   const [titleLine, location, p1, p2, edu] = about.paras;
   const first = p1.split(/(?<=\.)\s/)[0];
@@ -414,8 +415,8 @@ ${footer}
 `;
 }
 
-function archiveHtml(index, entries, base) {
-  const { head, footer } = chrome(index);
+function archiveHtml(index, entries, base, version) {
+  const { head, footer } = chrome(index, version);
   const n = entries.length;
   const rows = [...entries].reverse().map((e) => `      ${rowHtml(e, base)}`).join('\n');
   const author = { '@type': 'Person', name: PERSON.name, url: PERSON.url };
@@ -475,9 +476,18 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   const year = valid.length ? Math.max(...valid.map((x) => Number(x.date.slice(0, 4)))) : null;
   if (!/© \d{4} Alex Pintea/.test(index)) throw new Error('index.html: footer "© <year> Alex Pintea" not found');
   if (year) index = index.replace(/© \d{4} Alex Pintea/, `© ${year} Alex Pintea`);
-  const [s, e] = between(index, '<!-- log:start -->\n', '<!-- log:end -->');
   const cfgPath = join(root, 'site.config.json');
-  const base = existsSync(cfgPath) ? String(JSON.parse(readFileSync(cfgPath, 'utf8')).handbook_base || '').trim() : '';
+  const cfg = existsSync(cfgPath) ? JSON.parse(readFileSync(cfgPath, 'utf8')) : {};
+  const base = String(cfg.handbook_base || '').trim();
+  const version = String(cfg.version || '').trim();
+  if (!version) throw new Error('site.config.json: "version" is missing');
+  // Share-image cache bust: og:image / twitter:image of the hand-written index.html carry ?v=<version>.
+  for (const prop of ['property="og:image"', 'name="twitter:image"']) {
+    const re = new RegExp(`(<meta ${prop} content="https://alepax\\.com/assets/img/og-home\\.png)(?:\\?v=[^"]*)?(")`);
+    if (!re.test(index)) throw new Error(`index.html: ${prop} tag for og-home.png not found`);
+    index = index.replace(re, `$1?v=${version}$2`);
+  }
+  const [s, e] = between(index, '<!-- log:start -->\n', '<!-- log:end -->');
   const home = newest.slice(0, HOME_COUNT);
   const homeRows = home.map((x) => `        ${rowHtml(x, base)}\n`).join('');
   const projects = JSON.parse(readFileSync(join(root, 'data', 'projects.json'), 'utf8'));
@@ -503,12 +513,12 @@ export function build({ root = ROOT_DEFAULT } = {}) {
 
   const outputs = {
     'index.html': withLog.slice(0, ms) + mapRows + withLog.slice(me),
-    'log/index.html': archiveHtml(index, valid, base),
+    'log/index.html': archiveHtml(index, valid, base, version),
     'feed.xml': feedXml(valid),
     'data/nodes.json': '[\n' + nodes.map((n) => '  ' + JSON.stringify(n)).join(',\n') + '\n]\n',
   };
   const smPath = join(root, 'sitemap.xml');
-  if (about) outputs['about/index.html'] = aboutHtml(index, about);
+  if (about) outputs['about/index.html'] = aboutHtml(index, about, version);
   if (existsSync(smPath)) {
     let sm = readFileSync(smPath, 'utf8').replace(/\r\n/g, '\n');
     const day = valid.length ? valid[valid.length - 1].date : null;
