@@ -4,6 +4,24 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.0] - 2026-11-16
+
+### Added
+
+- Per-page Open Graph and Twitter tags, with four generated share images (`node scripts/make-og.mjs`, each <= 60 KB) that replace the 181 KB og.png
+- Blog JSON-LD for the ten newest log entries
+- Atom feed at `/feed.xml`, linked from every page
+- Sharing tests (`tests/sharing.test.mjs`)
+
+### Fixed
+
+- A double Reload during one rebuild is ignored
+
+### Removed
+
+- `lighthouse-budget.json`; `.lighthouserc.json` is the single source of the 150 KB limit
+- `og.png`
+
 ## [1.7.0] - 2026-11-16
 
 ### Added

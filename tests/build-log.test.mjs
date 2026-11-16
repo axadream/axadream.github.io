@@ -145,7 +145,7 @@ test('build: numbering, escaping, counts, --check round-trip', () => {
     assert.ok(!/log-ep\d/.test(home));
     assert.ok(r.outputs['log/index.html'].includes('href="/#projects"'));
 
-    assert.deepEqual(outOfDate(root, r.outputs).sort(), ['data/nodes.json', 'index.html', 'log/index.html']);
+    assert.deepEqual(outOfDate(root, r.outputs).sort(), ['data/nodes.json', 'feed.xml', 'index.html', 'log/index.html']);
     writeOutputs(root, r.outputs);
     assert.deepEqual(outOfDate(root, build({ root }).outputs), []);
     writeFileSync(join(root, 'data', 'nodes.json'), '[]\n');

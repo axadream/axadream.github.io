@@ -143,7 +143,9 @@ if (!reduced) {
 		} catch (e) { return false; }
 	};
 	// A canvas whose context was force-lost cannot get a new one, so rebuild on a fresh canvas.
-	const rebuild = () => {
+	// A call while a rebuild is in flight returns the same promise instead of rebuilding twice.
+	let inflight = null;
+	const doRebuild = () => {
 		try { scene && scene.dispose(); } catch (e) { }
 		scene = null;
 		const n = cv.cloneNode(false);
@@ -153,6 +155,7 @@ if (!reduced) {
 		box.classList.remove('scene-on');
 		return start();
 	};
+	const rebuild = () => inflight || (inflight = doRebuild().finally(() => { inflight = null; }));
 
 	window.addEventListener('pagehide', (e) => {
 		if (e.persisted) { scene && scene.pause(); return; }

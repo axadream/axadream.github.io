@@ -2,51 +2,22 @@
 // The hero graph loads only after the user clicks #graph-play (budget rule, guard "user-action load").
 // Run: npx --yes playwright@1.48.2 install chromium   (once)
 //      node tests/graph-regression.mjs
-import http from 'node:http';
-import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
+import { loadPlaywright, startStaticServer, launchChromium } from '../scripts/lib/playwright.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.png': 'image/png', '.webp': 'image/webp' };
 
-async function loadPlaywright() {
-	try { return await import('playwright'); } catch (e) { /* fall through */ }
-	const dirs = [];
-	const npx = path.join(process.env.LOCALAPPDATA || '', 'npm-cache', '_npx');
-	if (fs.existsSync(npx)) for (const d of fs.readdirSync(npx)) dirs.push(path.join(npx, d, 'node_modules'));
-	const extra = [...(process.env.PATH || '').split(path.delimiter), ...(process.env.NODE_PATH || '').split(path.delimiter)];
-	for (const p of extra) if (p.includes('_npx')) dirs.push(p.endsWith('node_modules') ? p : path.join(p, 'node_modules'), path.join(p, '..', 'node_modules'));
-	for (const d of dirs) {
-		const f = path.join(d, 'playwright', 'index.mjs');
-		if (fs.existsSync(f)) return import(pathToFileURL(f).href);
-	}
-	console.error('playwright not found. Run: npx --yes playwright@1.48.2 install chromium   then retry.');
-	process.exit(2);
-}
-
-const server = http.createServer((req, res) => {
-	const u = decodeURIComponent(req.url.split('?')[0]);
-	let f = path.join(ROOT, u);
-	if (!f.startsWith(ROOT) || u.startsWith('/OpenHorizon')) f = '';
-	if (f && fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, 'index.html');
-	if (f && fs.existsSync(f)) {
-		res.writeHead(200, { 'content-type': MIME[path.extname(f)] || 'application/octet-stream' });
-		return fs.createReadStream(f).pipe(res);
-	}
-	res.writeHead(200, { 'content-type': 'text/html' });
-	res.end('<!doctype html><title>stub</title><p>stub page</p>');
+// /OpenHorizon paths are blocked and misses get a 200 stub page (the graph test needs a navigable target there).
+const { server, base: origin } = await startStaticServer(ROOT, {
+	indexDirs: true,
+	deny: (u) => u.startsWith('/OpenHorizon'),
+	notFound: (res) => { res.writeHead(200, { 'content-type': 'text/html' }); res.end('<!doctype html><title>stub</title><p>stub page</p>'); },
 });
-await new Promise((r) => server.listen(0, '127.0.0.1', r));
-const base = `http://127.0.0.1:${server.address().port}/`;
+const base = `${origin}/`;
 
-const { chromium } = await loadPlaywright();
 // bfcache is enabled (Playwright disables it by default); fall back to installed Chrome/Edge if bundled Chromium cannot start.
-let browser;
-for (const o of [{}, { channel: 'chrome' }, { channel: 'msedge' }]) {
-	try { browser = await chromium.launch({ ...o, ignoreDefaultArgs: ['--disable-back-forward-cache'] }); break; } catch (e) { /* try next */ }
-}
-if (!browser) { console.error('no usable browser; run: npx --yes playwright@1.48.2 install chromium'); process.exit(2); }
+const browser = await launchChromium(await loadPlaywright(), { ignoreDefaultArgs: ['--disable-back-forward-cache'] });
 let failed = 0;
 const report = (name, ok, info = '') => { if (!ok) failed++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  (' + info + ')' : ''}`); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -275,6 +246,33 @@ try {
 		const three = threeHits(urls);
 		const pass = gap.gap <= 50 && gap.disabledAfterPlay === true && up && moving && enabledAfter === true && errs.length === 0 && three === 1;
 		report('H Play+Reload within 50 ms: Reload disabled, no error, one three.module request, Reload re-enabled', pass, `gap=${gap.gap.toFixed(1)}ms disabledAfterPlay=${gap.disabledAfterPlay} graph=${up} moving=${moving} enabledAfter=${enabledAfter} errors=${errs.length} three=${three}`);
+		await ctx.close();
+	}
+	// (I) Two Reload clicks in one tick: one rebuild (one canvas replacement), no error, one three.module request
+	{
+		const { ctx, page, urls } = await openPage();
+		const errs = [];
+		page.on('pageerror', (e) => errs.push(String(e)));
+		page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+		await page.locator('#graph-play').click();
+		await ready(page);
+		await sleep(300);
+		const swaps = await page.evaluate(() => new Promise((resolve) => {
+			const box = document.getElementById('hero-box');
+			let n = 0;
+			const mo = new MutationObserver((recs) => { for (const r of recs) for (const node of r.addedNodes) if (node.nodeName === 'CANVAS') n++; });
+			mo.observe(box, { childList: true, subtree: true });
+			const rl = document.getElementById('graph-reload');
+			rl.click();
+			rl.click();
+			// the second click is ignored while the first rebuild is in flight
+			setTimeout(() => { mo.disconnect(); resolve(n); }, 0);
+		}));
+		const up = await ready(page);
+		await sleep(300);
+		const three = threeHits(urls);
+		const pass = up && swaps === 1 && errs.length === 0 && three === 1;
+		report('I double Reload in one tick: one rebuild, no error, one three.module request', pass, `graph=${up} canvasReplaced=${swaps} errors=${errs.length} three=${three}`);
 		await ctx.close();
 	}
 } finally {
