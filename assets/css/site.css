@@ -330,6 +330,8 @@ a.log-card-id:hover { color: var(--accent); border-color: var(--accent); }
   border-radius: 999px; color: var(--text); text-decoration: none;
 }
 .start-here a:hover { border-color: var(--accent); color: var(--accent); }
+.start-more { margin: var(--s1, 8px) 0 0; color: var(--muted); font-size: .92rem; }
+.start-more a { color: inherit; text-decoration: underline; }
 
 /* footer */
 .site-footer { border-top: 1px solid var(--card-border); margin-top: var(--s3); padding-block: var(--s4); }

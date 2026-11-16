@@ -235,13 +235,14 @@ function between(html, startTag, endTag) {
 }
 
 /** Start-here nav: exactly three links; the handbook link is omitted when handbook_base is empty. */
-export function startHereHtml(base = '') {
+export function startHereHtml(base = '', home = false) {
   const items = [
     '    <li><a href="/OpenHorizon/">OpenHorizon</a></li>\n',
-    base ? `    <li><a href="${esc(base)}">AI Engineering Handbook</a></li>\n` : '',
+    base ? `    <li><a href="${esc(base)}">Handbook</a></li>\n` : '',
     '    <li><a href="https://github.com/axadream" rel="noopener noreferrer">GitHub</a></li>\n',
   ].join('');
-  return `<nav class="start-here" aria-label="Start here">\n  <ul>\n${items}  </ul>\n</nav>\n`;
+  const more = home ? '<p class="start-more">What the labels mean, and all entries → <a href="/log/">/log/</a></p>\n' : '';
+  return `<nav class="start-here" aria-label="Start here">\n  <ul>\n${items}  </ul>\n</nav>\n${more}`;
 }
 
 /** Static legend for the archive page only. Badge classes match the card badges. */
@@ -349,7 +350,7 @@ export function build({ root = ROOT_DEFAULT } = {}) {
   }).join('');
   let withLog = index.slice(0, s) + homeRows + index.slice(e);
   const [ss, se] = between(withLog, '<!-- start:start -->\n', '<!-- start:end -->');
-  withLog = withLog.slice(0, ss) + startHereHtml(base) + withLog.slice(se);
+  withLog = withLog.slice(0, ss) + startHereHtml(base, true) +withLog.slice(se);
   const [ms, me] = between(withLog, '<!-- sitemap:start -->\n', '<!-- sitemap:end -->');
 
   return {

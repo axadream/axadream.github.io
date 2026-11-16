@@ -179,6 +179,24 @@ test('build: cards plain text without handbook_base, links with it; trace and pr
   }
 });
 
+test('build: production handbook_base links L0-028 and adds the Handbook button', () => {
+  const cfg = JSON.parse(readFileSync(join(repo, 'site.config.json'), 'utf8'));
+  assert.equal(cfg.handbook_base, 'https://alepax.com/AI_Engineering_Handbook/');
+  const root = tempRoot(['cards-handbook.md'], { handbook_base: cfg.handbook_base });
+  try {
+    const r = build({ root });
+    assert.equal(r.stats.invalid, 0);
+    for (const out of [r.outputs['index.html'], r.outputs['log/index.html']]) {
+      assert.ok(out.includes('href="https://alepax.com/AI_Engineering_Handbook/#l0-028"'));
+      assert.ok(out.includes('<li><a href="https://alepax.com/AI_Engineering_Handbook/">Handbook</a></li>'));
+    }
+    assert.ok(r.outputs['index.html'].includes('What the labels mean, and all entries → <a href="/log/">/log/</a>'));
+    assert.ok(!r.outputs['log/index.html'].includes('What the labels mean'));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('build: empty optionals render no cards, proof or trace', () => {
   const root = tempRoot(['empty-optionals.md']);
   try {
