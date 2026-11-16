@@ -182,8 +182,10 @@ if (!reduced) {
 		if (play.disabled || play.getAttribute('aria-pressed') === 'true') return;
 		play.disabled = true;
 		ui(true);
+		if (rl) rl.disabled = true;
 		const ok = await start();
 		play.disabled = false;
+		if (rl) rl.disabled = false;
 		if (!ok) fail(); else note();
 	});
 	if (rl) rl.addEventListener('click', async () => {
