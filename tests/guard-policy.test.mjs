@@ -66,3 +66,17 @@ test('stale build outputs: default warns and passes, strict fails', () => {
   const strict = guard(dir, ['--strict']);
   assert.equal(strict.status, 1, strict.stdout + strict.stderr);
 });
+
+test('user-action load: site.js graph import without the marker fails the guard', () => {
+  const dir = makeCopy();
+  // Fixture site.js whose only graph reference lacks the /* user-action-load */ marker.
+  writeFileSync(
+    join(dir, 'assets', 'js', 'site.js'),
+    "const graph = () => import('./graph-scene.js');\n",
+    'utf8'
+  );
+
+  const def = guard(dir);
+  assert.equal(def.status, 1, def.stdout + def.stderr);
+  assert.match(def.stdout, /user-action load: assets\/js\/site\.js line 1 .*\/\* user-action-load \*\//);
+});

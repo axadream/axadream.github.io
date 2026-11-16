@@ -127,7 +127,8 @@ node scripts/check-no-business.mjs
 ```
 
 It fails on commercial and advertising terms, and on the reserved sub-project
-segment in any shipped path. It also reports gzipped first-party JS against a 12 KB budget.
+segment in any shipped path. It also enforces the per-page budget: first-party gzipped JS <= 12,288 B, and no chunk may load without a user action.
+`index.html` must not reference `graph-scene.js` or `three.module`; `assets/js/site.js` may reference them only on a line carrying the `/* user-action-load */` marker.
 Stale generated outputs (the `index.html` log region, `log/index.html`, `data/nodes.json`)
 only WARN by default, because markdown-only post commits may leave them stale; CI rebuilds them.
 The exit code is unchanged. `--strict` makes stale outputs FAIL (exit 1).

@@ -1,4 +1,5 @@
 // Graph regression test (headless Chromium via Playwright, serves the repo itself).
+// The hero graph loads only after the user clicks #graph-play (budget rule, guard "user-action load").
 // Run: npx --yes playwright@1.48.2 install chromium   (once)
 //      node tests/graph-regression.mjs
 import http from 'node:http';
@@ -50,14 +51,23 @@ let failed = 0;
 const report = (name, ok, info = '') => { if (!ok) failed++; console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${info ? '  (' + info + ')' : ''}`); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const ready = (page) => page.waitForFunction(() => !!window.__graph, null, { timeout: 8000 }).then(() => true, () => false);
+// Clicks the Play button (skipped when it is already disabled, e.g. a bfcache restore of a started page), then waits for the graph.
+const play = async (page) => {
+	const btn = page.locator('#graph-play');
+	if (await btn.isEnabled().catch(() => false)) await btn.click();
+	return ready(page);
+};
 const pos = (page) => page.evaluate(() => Object.fromEntries(window.__graph.positions().map(([id, x, y]) => [id, [x, y]])));
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const threeHits = (urls) => urls.filter((u) => u.includes('three.module')).length;
 
 async function openPage(opts = {}, query = 'force') {
 	const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'no-preference', ...opts });
 	const page = await ctx.newPage();
+	const urls = [];
+	page.on('request', (r) => urls.push(r.url()));
 	await page.goto(base + '?motion=' + query); // 'reduce' = debug hook on, reduced motion honoured
-	return { ctx, page };
+	return { ctx, page, urls };
 }
 
 // Returns {id, client:[x,y]} for the node nearest to the box centre, using client coordinates.
@@ -87,16 +97,37 @@ async function dragNode(page, steps = 6, dx = 80) {
 }
 
 try {
+	// (E) user-action load: nothing from three.module before the click, exactly one request after it, and the graph runs
+	{
+		const { ctx, page, urls } = await openPage();
+		await sleep(1500);
+		const before = threeHits(urls);
+		const up = await play(page);
+		const after = threeHits(urls);
+		report('E no three.module request before click', before === 0, `before=${before}`);
+		report('E exactly one three.module request after click', up && after === 1, `graph=${up} after=${after}`);
+		let moving = false;
+		if (up) {
+			await sleep(500);
+			const p1 = await pos(page);
+			await sleep(1000);
+			const p2 = await pos(page);
+			moving = Object.keys(p1).some((k) => dist(p1[k], p2[k]) > 0.05);
+		}
+		report('E graph runs after click', up && moving, `moving=${moving}`);
+		await ctx.close();
+	}
+
 	// (A) back navigation after leaving to /OpenHorizon/
 	{
 		const { ctx, page } = await openPage();
-		const up = await ready(page);
+		const up = await play(page);
 		if (!up) report('A graph starts on fresh load', false, 'no __graph');
 		else {
 			await page.locator('a[href="/OpenHorizon/"]:visible').first().click();
 			await page.waitForURL('**/OpenHorizon/');
 			await page.goBack({ waitUntil: 'commit' }); // a bfcache restore fires no load event
-			const alive = await ready(page);
+			const alive = await play(page);
 			let moving = false, gl = false;
 			if (alive) {
 				await sleep(500);
@@ -114,9 +145,9 @@ try {
 	// (B) drag works after a reload
 	{
 		const { ctx, page } = await openPage();
-		await ready(page);
+		await play(page);
 		await page.reload();
-		const up = await ready(page);
+		const up = await play(page);
 		let moved = 0;
 		if (up) { await sleep(2000); moved = (await dragNode(page)).moved; }
 		report('B drag works after reload', up && moved > 40, `moved=${moved.toFixed?.(1)}px`);
@@ -126,7 +157,7 @@ try {
 	// (C) clicking a node navigates
 	{
 		const { ctx, page } = await openPage();
-		await ready(page);
+		await play(page);
 		await sleep(2000);
 		const t = await target(page);
 		const href0 = page.url();
@@ -141,7 +172,7 @@ try {
 	// (D) reduced motion: no drift, drag still works, node stays put, loop goes idle
 	{
 		const { ctx, page } = await openPage({ reducedMotion: 'reduce' }, 'reduce');
-		const up = await ready(page);
+		const up = await play(page);
 		let still = 99, moved = 0, kept = 99, en = -1;
 		if (up) {
 			await sleep(1500);

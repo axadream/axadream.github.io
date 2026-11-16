@@ -4,6 +4,14 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-11-16
+
+### Changed
+
+- Hero graph loads only on click of `#graph-play`; no graph chunk or `three.module` is requested before the user acts.
+- Budget rule restated: per-page first-party gzipped JS <= 12,288 B, and no chunk may load without a user action.
+- Guard: new `user-action load` check fails the build if `index.html` references a lazy chunk, or if `assets/js/site.js` references one without the `/* user-action-load */` marker.
+
 ## [1.2.1] - 2026-11-16
 
 ### Added
