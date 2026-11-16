@@ -34,3 +34,10 @@ test('site.js: reload failure path is wired and user-action-load marker appears 
   assert.equal(js.split('/* user-action-load */').length - 1, 1, 'marker once');
   assert.ok(js.includes("if (!(await rebuild())) { ui(false);"), 'reload failure restores idle state');
 });
+
+test('shipped pages contain no double-encoded characters', () => {
+  const bad = /â€|Â[·©]/;
+  for (const p of ['index.html', 'about/index.html', 'log/index.html']) {
+    assert.ok(!bad.test(read(p)), p + ' has mojibake');
+  }
+});
