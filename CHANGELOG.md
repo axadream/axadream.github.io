@@ -4,6 +4,17 @@ All notable changes to this site are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2026-11-16
+
+### Added
+
+- Lighthouse CI with budgets (performance >= 0.90, accessibility = 1, best-practices >= 0.95, seo = 1, home page <= 150 KB before any click); a failing assertion blocks deploy
+
+### Fixed
+
+- Version check now reads the footer of every generated page
+- Reload is disabled during the first in-flight load
+
 ## [1.6.1] - 2026-11-16
 
 ### Fixed

@@ -8,6 +8,7 @@
 // Node >= 18, no dependencies.
 
 import { readdir, readFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { dirname, join, relative, sep, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -154,17 +155,31 @@ try {
   failures.push(`CHANGELOG.md: cannot read (${e.message})`);
 }
 
+// Footer version check on every generated page. Core pages must exist; work/*/index.html is optional.
+const CORE_PAGES = ['index.html', 'about/index.html', 'log/index.html'];
+let workPages = [];
 try {
-  const html = await readFile(join(root, 'index.html'), 'utf8');
+  const dirs = await readdir(join(root, 'work'), { withFileTypes: true });
+  workPages = dirs.filter((d) => d.isDirectory()).map((d) => `work/${d.name}/index.html`);
+} catch (e) {
+  if (e.code !== 'ENOENT') failures.push(`work/: cannot read (${e.message})`);
+}
+workPages = workPages.filter((p) => existsSync(join(root, p)));
+for (const page of [...CORE_PAGES, ...workPages]) {
+  let html;
+  try {
+    html = await readFile(join(root, page), 'utf8');
+  } catch (e) {
+    failures.push(`${page}: cannot read (${e.message})`);
+    continue;
+  }
   const p = html.match(/<p class="foot-ver"[^>]*>([\s\S]*?)<\/p>/);
   const v = p && p[1].match(/v(\d+\.\d+\.\d+)/);
   if (!v) {
-    failures.push('index.html: no v<semver> inside the .foot-ver paragraph');
+    failures.push(`${page}: no v<semver> inside the .foot-ver paragraph`);
   } else if (v[1] !== version) {
-    failures.push(`version mismatch: site.config.json has ${version}, index.html footer has ${v[1]}`);
+    failures.push(`${page}: footer has v${v[1]}, site.config.json has ${version}`);
   }
-} catch (e) {
-  failures.push(`index.html: cannot read (${e.message})`);
 }
 
 // JS budget (5): per page: first-party gzipped JS <= 12,288 B, and no chunk may load

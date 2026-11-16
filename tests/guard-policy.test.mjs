@@ -1,6 +1,6 @@
 import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, cpSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, cpSync, readFileSync, writeFileSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -80,3 +80,23 @@ test('user-action load: site.js graph import without the marker fails the guard'
   assert.equal(def.status, 1, def.stdout + def.stderr);
   assert.match(def.stdout, /user-action load: assets\/js\/site\.js line 1 .*\/\* user-action-load \*\//);
 });
+
+// Replace the version inside a page's .foot-ver paragraph with 0.0.1 (a stale footer).
+function staleFooter(dir, page) {
+  const file = join(dir, page);
+  const html = readFileSync(file, 'utf8');
+  const next = html.replace(/(<p class="foot-ver"[^>]*>[\s\S]*?)v\d+\.\d+\.\d+/, (_, pre) => `${pre}v0.0.1`);
+  assert.notEqual(next, html, `no footer version found in ${page}`);
+  writeFileSync(file, next, 'utf8');
+}
+
+for (const page of ['about/index.html', 'log/index.html']) {
+  test(`stale footer on ${page} fails the guard and names the page`, () => {
+    const dir = makeCopy();
+    staleFooter(dir, page);
+    const r = guard(dir);
+    assert.equal(r.status, 1, r.stdout + r.stderr);
+    const escaped = page.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+    assert.match(r.stdout + r.stderr, new RegExp(`${escaped}: footer has v0\\.0\\.1`));
+  });
+}

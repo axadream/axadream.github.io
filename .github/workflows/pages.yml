@@ -27,14 +27,43 @@ jobs:
       - name: Stage site
         run: |
           mkdir _site
-          rsync -a --exclude .git --exclude .github --exclude _site --exclude scripts --exclude tests --exclude content --exclude schema --exclude node_modules ./ _site/
+          rsync -a --exclude .git --exclude .github --exclude _site --exclude scripts --exclude tests --exclude content --exclude schema --exclude node_modules --exclude .lighthouserc.json --exclude lighthouse-budget.json --exclude .lighthouseci ./ _site/
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: _site
 
-  deploy:
+  lighthouse:
     needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: github-pages
+          path: ${{ runner.temp }}/pages-artifact
+      - name: Extract staged site
+        run: |
+          mkdir _site
+          tar -xf "$RUNNER_TEMP/pages-artifact/artifact.tar" -C _site
+      - name: Lighthouse CI
+        run: npx --yes @lhci/cli@0.14.0 autorun
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: lighthouse-reports
+          path: |
+            .lighthouseci
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  deploy:
+    needs: [build, lighthouse]
     runs-on: ubuntu-latest
     permissions:
       pages: write

@@ -159,6 +159,10 @@ Code changes must run `node scripts/build-log.mjs`, then `node scripts/check-no-
 - OpenHorizon is a separate repository, served at `/OpenHorizon/` by GitHub Pages.
   Nothing with that name may be added to this repository.
 - To publish, merge `v1-site` into `main`.
+- The `lighthouse` job runs after `build` on the staged site, using @lhci/cli (dev-only, pinned). It checks `/`, `/about/` and `/log/` against the thresholds (performance >= 0.90, accessibility = 1, best-practices >= 0.95, seo = 1, home page <= 150 KB before any click). Deploy waits for it, so a failing assertion blocks the release.
+- HTML reports are in the workflow run's Artifacts as `lighthouse-reports`. Thresholds live in `.lighthouserc.json`; the 150 KB budget is documented in `lighthouse-budget.json`.
+- `.lighthouserc.json` is the enforced source of the 150 KB limit; `lighthouse-budget.json` mirrors it for reference.
+- If a first run fails in an unexpected way, revert the merge in one PR.
 
 ### Deploy: switching Pages to GitHub Actions
 

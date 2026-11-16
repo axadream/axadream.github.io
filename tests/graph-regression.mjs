@@ -245,6 +245,38 @@ try {
 		report('G motion allowed: label empty and nodes drift >2px in 3 s', upO && textO === '' && disp > 2, `label=${JSON.stringify(textO)} disp=${disp.toFixed(1)}px`);
 		await o.ctx.close();
 	}
+	// (H) Play then Reload in the same tick (<= 50 ms): Reload is disabled during the first load, so no error and one three.module request
+	{
+		const { ctx, page, urls } = await openPage();
+		const errs = [];
+		page.on('pageerror', (e) => errs.push(String(e)));
+		page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+		await sleep(500); // let the page wire the buttons before the same-tick clicks
+		const gap = await page.evaluate(() => {
+			const p = document.getElementById('graph-play');
+			const r = document.getElementById('graph-reload');
+			const t0 = performance.now();
+			p.click();
+			const disabledAfterPlay = r.disabled;
+			r.click();
+			return { gap: performance.now() - t0, disabledAfterPlay };
+		});
+		const up = await ready(page);
+		let moving = false;
+		let enabledAfter = false;
+		if (up) {
+			await sleep(500);
+			const p1 = await pos(page);
+			await sleep(1000);
+			const p2 = await pos(page);
+			moving = Object.keys(p1).some((k) => dist(p1[k], p2[k]) > 0.05);
+			enabledAfter = await page.evaluate(() => !document.getElementById('graph-reload').disabled);
+		}
+		const three = threeHits(urls);
+		const pass = gap.gap <= 50 && gap.disabledAfterPlay === true && up && moving && enabledAfter === true && errs.length === 0 && three === 1;
+		report('H Play+Reload within 50 ms: Reload disabled, no error, one three.module request, Reload re-enabled', pass, `gap=${gap.gap.toFixed(1)}ms disabledAfterPlay=${gap.disabledAfterPlay} graph=${up} moving=${moving} enabledAfter=${enabledAfter} errors=${errs.length} three=${three}`);
+		await ctx.close();
+	}
 } finally {
 	await browser.close();
 	server.close();
