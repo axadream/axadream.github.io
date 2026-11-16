@@ -258,10 +258,11 @@ const LEGEND_HTML = `<section class="log-legend" aria-label="Legend">
 `;
 
 /** Open Graph / Twitter card tags plus the Atom alternate link. Inputs are plain text. */
-export function metaTags({ title, desc, url, image }) {
+export function metaTags({ title, desc, url, image, profile = false }) {
   const img = `https://alepax.com/assets/img/${image}`;
   return [
-    '<meta property="og:type" content="website">',
+    `<meta property="og:type" content="${profile ? 'profile' : 'website'}">`,
+    ...(profile ? ['<meta property="profile:first_name" content="Alex">', '<meta property="profile:last_name" content="Pintea">'] : []),
     '<meta property="og:site_name" content="Alex Pintea">',
     `<meta property="og:title" content="${esc(title)}">`,
     `<meta property="og:description" content="${esc(desc)}">`,
@@ -319,7 +320,7 @@ function chrome(index, { aboutCurrent = false } = {}) {
   let nav = header.replace('href="#projects"', 'href="/#projects"').replace('href="#log"', aboutCurrent ? 'href="/log/"' : 'href="/#log"');
   if (aboutCurrent) { const navAbout = nav.replace('<a href="/about/">', '<a href="/about/" aria-current="page">'); if (navAbout === nav) throw new Error('index.html header: About link not found'); nav = navAbout; }
   // title/desc are plain text (escaped here); image is a file name under /assets/img/.
-  const head = (title, desc, canonical, extra, image) => {
+  const head = (title, desc, canonical, extra, image, profile = false) => {
   if (image === undefined) throw new Error('head(): image is required');
   return `<!doctype html>
 <html lang="en">
@@ -332,7 +333,7 @@ function chrome(index, { aboutCurrent = false } = {}) {
 <meta name="theme-color" content="#0F1115" id="tc">
 <meta name="color-scheme" content="dark">
 ${themeScript}
-${metaTags({ title, desc, url: canonical, image })}
+${metaTags({ title, desc, url: canonical, image, profile })}
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="/assets/img/favicon.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
@@ -368,7 +369,7 @@ function aboutHtml(index, about) {
   const person = { '@context': 'https://schema.org', '@type': 'Person', ...PERSON, jobTitle: about.jobTitle };
   const page = { '@context': 'https://schema.org', '@type': 'ProfilePage', url: 'https://alepax.com/about/', mainEntity: { '@type': 'Person', name: PERSON.name, url: PERSON.url } };
   const tile = (href, title, text) => `      <a class="card about-tile" href="${href}"><h3>${title}</h3><p>${text}</p><span class="about-arrow" aria-hidden="true">→</span></a>\n`;
-  return head('About — Alex Pintea', first, 'https://alepax.com/about/', ld(person) + ld(page), 'og-about.png') + `<main id="main">
+  return head('About — Alex Pintea', first, 'https://alepax.com/about/', ld(person) + ld(page), 'og-about.png', true) + `<main id="main">
   <section class="about-hero" aria-labelledby="about-name">
     <div class="wrap">
       <h1 id="about-name" class="about-name">Alex Pintea</h1>
