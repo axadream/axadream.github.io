@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title>og template</title>
+<link rel="stylesheet" href="/assets/css/site.css">
+<style>
+	html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'Space Grotesk', system-ui, sans-serif; }
+	.card { position: relative; box-sizing: border-box; width: 1200px; height: 630px; padding: 72px 80px; }
+	.bar { position: absolute; left: 0; top: 0; width: 16px; height: 630px; background: var(--accent); }
+	.kicker { margin: 0; font-size: 30px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+	.name { margin: 120px 0 0; font-size: 150px; line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+	.title { margin: 28px 0 0; font-size: 48px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+	.mark { position: absolute; left: 80px; bottom: 64px; font-size: 34px; letter-spacing: 0.02em; }
+</style>
+</head>
+<body>
+<div class="card">
+	<div class="bar"></div>
+	<p class="kicker" id="kicker"></p>
+	<h1 class="name">Alex Pintea</h1>
+	<p class="title" id="title"></p>
+	<div class="mark">alepax.com</div>
+</div>
+<script>
+	var q = new URLSearchParams(location.search);
+	document.getElementById('kicker').textContent = q.get('type') || '';
+	document.getElementById('title').textContent = q.get('title') || '';
+</script>
+</body>
+</html>
